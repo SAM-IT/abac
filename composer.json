@@ -1,0 +1,13 @@
+{
+    "name": "sam-it/abac",
+    "description": "Attribute based access control",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sam Mousa",
+            "email": "sam@mousa.nl"
+        }
+    ],
+    "require": {}
+}
