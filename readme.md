@@ -15,3 +15,6 @@ Configuration:
         'accessChecker' => 'abac'
     ]
 ````
+
+# Infinite loops.
+Currently there is no pro

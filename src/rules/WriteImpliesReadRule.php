@@ -3,16 +3,22 @@
 
 namespace prime\auth\rules;
 
-use SamIT\ABAC\Authorizable;
+use SamIT\ABAC\interfaces\Authorizable;
 use SamIT\ABAC\Manager;
-use SamIT\ABAC\User;
+use SamIT\ABAC\interfaces\Rule;
 
+/**
+ * Class WriteImpliesReadRule
+ * @package prime\auth\rules
+ * This rule allows a user to read something as long as they can write it.
+ */
 class WriteImpliesReadRule implements Rule
 {
 
 
     /**
      * @inheritdoc
+     * "you can ... if [description]"
      */
     public function getDescription()
     {
@@ -21,7 +27,7 @@ class WriteImpliesReadRule implements Rule
 
     /**
      * @param Authorizable $source
-     * @param Authorizable $target
+     * @param \SamIT\ABAC\interfaces\Authorizable $target
      * @return boolean
      */
     public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager)

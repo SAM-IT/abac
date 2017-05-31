@@ -3,11 +3,16 @@
 
 namespace prime\auth\rules;
 
-use SamIT\ABAC\Authorizable;
+use SamIT\ABAC\interfaces\Authorizable;
 use SamIT\ABAC\Manager;
-use SamIT\ABAC\User;
+use SamIT\ABAC\interfaces\Rule;
 
-class UserWriteImpliesReadRule implements Rule
+/**
+ * Class UserWriteImpliesReadRule
+ * This is an example rule.
+ * @package prime\auth\rules
+ */
+abstract class UserWriteImpliesReadRule implements Rule
 {
 
 

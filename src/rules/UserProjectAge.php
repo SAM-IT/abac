@@ -4,11 +4,16 @@
 namespace prime\auth\rules;
 
 
-use SamIT\ABAC\Authorizable;
+use SamIT\ABAC\interfaces\Authorizable;
 use SamIT\ABAC\Manager;
-use SamIT\ABAC\User;
+use SamIT\ABAC\interfaces\Rule;
 
-class UserProjectAge implements Rule
+/**
+ * Class UserProjectAge
+ * This is an example rule.
+ * @package prime\auth\rules
+ */
+abstract class UserProjectAge implements Rule
 {
 
 

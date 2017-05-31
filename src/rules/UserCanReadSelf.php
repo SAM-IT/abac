@@ -4,11 +4,12 @@
 namespace SamIT\ABAC\rules;
 
 
-use SamIT\ABAC\Authorizable;
+use SamIT\ABAC\interfaces\Authorizable;
 use SamIT\ABAC\Manager;
-use SamIT\ABAC\User;
+use SamIT\ABAC\interfaces\Rule;
 
-class UserCanReadSelf implements Rule
+
+abstract class UserCanReadSelf implements Rule
 {
 
 
@@ -22,8 +23,8 @@ class UserCanReadSelf implements Rule
     }
 
     /**
-     * @param Authorizable $source
-     * @param Authorizable $target
+     * @param \SamIT\ABAC\interfaces\Authorizable $source
+     * @param \SamIT\ABAC\interfaces\Authorizable $target
      * @return boolean
      */
     public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager)

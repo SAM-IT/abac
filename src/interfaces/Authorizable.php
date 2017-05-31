@@ -1,7 +1,7 @@
 <?php
 
 
-namespace SamIT\ABAC;
+namespace SamIT\ABAC\interfaces;
 
 
 interface Authorizable
