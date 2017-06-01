@@ -3,9 +3,9 @@
 
 namespace prime\auth\rules;
 
-use SamIT\ABAC\interfaces\Authorizable;
-use SamIT\ABAC\Manager;
-use SamIT\ABAC\interfaces\Rule;
+use SamIT\abac\interfaces\Authorizable;
+use SamIT\abac\Manager;
+use SamIT\abac\interfaces\Rule;
 
 /**
  * Class WriteImpliesReadRule
@@ -27,7 +27,7 @@ class WriteImpliesReadRule implements Rule
 
     /**
      * @param Authorizable $source
-     * @param \SamIT\ABAC\interfaces\Authorizable $target
+     * @param \SamIT\abac\interfaces\Authorizable $target
      * @return boolean
      */
     public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager)

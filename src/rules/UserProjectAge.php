@@ -4,9 +4,9 @@
 namespace prime\auth\rules;
 
 
-use SamIT\ABAC\interfaces\Authorizable;
-use SamIT\ABAC\Manager;
-use SamIT\ABAC\interfaces\Rule;
+use SamIT\abac\interfaces\Authorizable;
+use SamIT\abac\Manager;
+use SamIT\abac\interfaces\Rule;
 
 /**
  * Class UserProjectAge

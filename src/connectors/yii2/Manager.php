@@ -1,10 +1,10 @@
 <?php
 
 
-namespace SamIT\ABAC\connectors\yii2;
+namespace SamIT\abac\connectors\yii2;
 
 
-class Manager extends \SamIT\ABAC\Manager implements \yii\rbac\AccessCheckerInterface, \yii\base\Configurable
+class Manager extends \SamIT\abac\Manager implements \yii\rbac\AccessCheckerInterface, \yii\base\Configurable
 {
     /**
      * In yii2 rules are expected to be in protected, as is config.

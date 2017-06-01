@@ -1,9 +1,9 @@
 <?php
 
-namespace SamIT\ABAC;
+namespace SamIT\abac;
 
-use SamIT\ABAC\interfaces\Authorizable;
-use SamIT\ABAC\interfaces\Rule;
+use SamIT\abac\interfaces\Authorizable;
+use SamIT\abac\interfaces\Rule;
 
 /**
  * Class Permission
@@ -95,7 +95,7 @@ abstract class Manager
      */
     protected function addCoreRules()
     {
-        $namespace = 'SamIT\\ABAC\\rules';
+        $namespace = 'SamIT\\abac\\rules';
         // Scan directory.
         foreach(scandir($this->ruleDirectory) as $file) {
             if (substr_compare($file, '.php', -4, 4, false) === 0) {

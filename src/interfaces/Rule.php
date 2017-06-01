@@ -1,11 +1,11 @@
 <?php
 
 
-namespace SamIT\ABAC\interfaces;
+namespace SamIT\abac\interfaces;
 
 
-use SamIT\ABAC\interfaces\Authorizable;
-use SamIT\ABAC\Manager;
+use SamIT\abac\interfaces\Authorizable;
+use SamIT\abac\Manager;
 
 interface Rule
 {

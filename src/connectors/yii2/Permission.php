@@ -1,6 +1,6 @@
 <?php
 
-namespace SamIT\ABAC\connectors\yii2;
+namespace SamIT\abac\connectors\yii2;
 
 use prime\models\ActiveRecord;
 use prime\models\ar\Project;

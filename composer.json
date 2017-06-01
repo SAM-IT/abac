@@ -9,5 +9,10 @@
             "email": "sam@mousa.nl"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "SamIT\\abac\\": ["src/"]
+        }
+    },
     "require": {}
 }
