@@ -43,14 +43,9 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\AccessCheckerInte
     }
 
     /**
-     * @param string $sourceName
-     * @param int $sourceId
-     * @param string $targetName
-     * @param int $targetId
-     * @param string $permission
-     * @return bool Whether the permission record was saved successfully.
+     * @inheritdoc
      */
-    protected function grantInternal($sourceName, $sourceId, $targetName, $targetId, $permission)
+    protected function grantInternal(string $sourceName, string $sourceId, string $targetName, string $targetId, string $permission): void
     {
         $perm = new Permission();
         $perm->source = $sourceName;
@@ -62,13 +57,9 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\AccessCheckerInte
     }
 
     /**
-     * @param string $sourceName
-     * @param int $sourceId
-     * @param string $targetName
-     * @param int $targetId
-     * @param string $permission
+     * @inheritdoc
      */
-    protected function revokeInternal($sourceName, $sourceId, $targetName, $targetId, $permission)
+    protected function revokeInternal(string $sourceName, string $sourceId, string $targetName, string $targetId, string $permission): void
     {
         Permission::deleteAll([
             'source_model' => $sourceName,
@@ -93,13 +84,9 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\AccessCheckerInte
     }
 
     /**
-     * @param string $sourceName
-     * @param int $sourceId
-     * @param string $targetName
-     * @param int $targetId
-     * @param $permission
+     * @inheritdoc
      */
-    protected function isAllowedExplicit($sourceName, $sourceId, $targetName, $targetId, $permission)
+    protected function isAllowedExplicit(string $sourceName, string $sourceId, string $targetName, string $targetId, string $permission): boolean
     {
         return Permission::find()->where([
             'source_model' => $sourceName,
