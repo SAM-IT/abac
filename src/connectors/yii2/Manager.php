@@ -53,7 +53,9 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\AccessCheckerInte
         $perm->target = $targetName;
         $perm->target_id = $targetId;
         $perm->permission = $permission;
-        return $perm->save();
+        if (!$perm->save()) {
+            throw new \Exception("Failed to grant permission.");
+        }
     }
 
     /**
@@ -68,7 +70,6 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\AccessCheckerInte
             'target_id' => $targetId,
             'permission' => $permission
         ]);
-        return !$this->isAllowedExplicit($sourceName, $sourceId, $targetName, $targetId, $permission);
     }
 
 
