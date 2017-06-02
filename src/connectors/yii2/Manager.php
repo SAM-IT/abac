@@ -4,13 +4,10 @@
 namespace SamIT\abac\connectors\yii2;
 
 
-class Manager extends \SamIT\abac\Manager implements \yii\rbac\AccessCheckerInterface, \yii\base\Configurable
+use SamIT\abac\AuthorizableDummy;
+
+class Manager extends \SamIT\abac\Manager implements \yii\rbac\CheckAccessInterface, \yii\base\Configurable
 {
-    /**
-     * In yii2 rules are expected to be in protected, as is config.
-     * @var string
-     */
-    protected $ruleDirectory = __DIR__ . '/../rules';
     /**
      * @var string The ActiveRecord class for users.
      */
@@ -30,9 +27,11 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\AccessCheckerInte
 
     public function __construct($config = [])
     {
+        parent::__construct();
         foreach($config as $key => $value) {
-            $this->$config = $value;
+            $this->$key = $value;
         }
+        $this->init();
     }
 
     public function init()
@@ -64,9 +63,9 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\AccessCheckerInte
     protected function revokeInternal(string $sourceName, string $sourceId, string $targetName, string $targetId, string $permission): void
     {
         Permission::deleteAll([
-            'source_model' => $sourceName,
+            'source_name' => $sourceName,
             'source_id' => $sourceId,
-            'target_model' => $targetId,
+            'target_name' => $targetId,
             'target_id' => $targetId,
             'permission' => $permission
         ]);
@@ -87,27 +86,22 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\AccessCheckerInte
     /**
      * @inheritdoc
      */
-    protected function isAllowedExplicit(string $sourceName, string $sourceId, string $targetName, string $targetId, string $permission): boolean
+    protected function isAllowedExplicit(string $sourceName, string $sourceId, string $targetName, string $targetId, string $permission): bool
     {
-        return Permission::find()->where([
-            'source_model' => $sourceName,
-            'source_id' => $sourceId,
-            'target_model' => $targetName,
-            'target_id' => $targetId,
-            'permission' => $permission
-        ])->exists();
-
+        return Permission::isAllowedById($sourceName, $sourceId, $targetName, $targetId, $permission);
     }
 
     protected function getUser($id)
     {
-        return call_user_func($this->userClass, 'findOne', $id);
+        if (\Yii::$app->user->id == $id) {
+            return \Yii::$app->user->identity;
+        }
+        return forward_static_call([$this->userClass, 'findOne'], $id);
     }
 
     public function checkAccess($userId, $permissionName, $params = [])
     {
         $source = $this->getUser($userId);
-        $target = $params['target'];
-        return $this->isAllowed($source, $target, $permissionName);
+        return $this->isAllowed($source, $params['target'] ?? new AuthorizableDummy(), $permissionName);
     }
 }

@@ -12,9 +12,9 @@ use yii\db\ActiveRecordInterface;
  * @package app\models
  * @property string $permission
  * @property string $source
- * @property int $source_id
+ * @property string $source_id
  * @property string $target
- * @property int $target_id
+ * @property string $target_id
  */
 class Permission extends \yii\db\ActiveRecord
 {
@@ -39,62 +39,62 @@ class Permission extends \yii\db\ActiveRecord
 
 
 
-    /**
-     * Checks if a set of sources is allowed $permission on the $target.
-     * @param ActiveRecordInterface $source The source object.
-     * @param ActiveRecordInterface $target The target objects.
-     * @param $permission The permission to be checked.
-     * @return boolean
-     * @throws \Exception
-     */
-    public static function isAllowed(ActiveRecordInterface $source, ActiveRecordInterface $target, $permission)
-    {
-        if ($target->primaryKey === null) {
-            throw new \Exception("Invalid record.");
-        }
-        return self::isAllowedById(get_class($source), $source->getPrimaryKey(), get_class($target), $target->getPrimaryKey(), $permission);
-    }
-
-
-    private static function getCache($sourceModel, $sourceId, $targetModel, $targetId, $permission)
+    private static function getCache($sourceName, $sourceId, $targetName, $targetId, $permission)
     {
         if (!isset($targetId)) {
             throw new \Exception('targetId is required');
         }
-        \Yii::info("Checking from cache: $sourceModel [$sourceId] --> $targetModel [$targetId]");
-        $key = md5($sourceModel . $sourceId . $targetModel . $targetId . $permission);
-
-        return isset(self::$cache[$key]) ? self::$cache[$key] : (isset(self::$cache[$sourceModel . $sourceId]) ? false : null);
+        \Yii::info("Checking from cache: $sourceName [$sourceId] --> $targetName [$targetId]");
+        $key = self::cacheKey($sourceName, $sourceId, $targetName, $targetId, $permission);
+        return self::$cache[$key] ?? self::$cache["$sourceName|$sourceId"] ?? null;
     }
 
-    private static function setCache($sourceModel, $sourceId, $targetModel, $targetId, $permission, $value)
+    private static function cacheKey($sourceName, $sourceId, $targetName, $targetId, $permission): string
     {
-        $key = md5($sourceModel . $sourceId . $targetModel . $targetId . $permission);
-        self::$cache[$key] = $value;
+        return implode('|', [$sourceName, $sourceId, $targetName, $targetId, $permission]);
     }
 
+    private static function setCache(
+        string $sourceName,
+        string $sourceId,
+        string $targetName,
+        string $targetId,
+        string $permission,
+        bool $value
+    ) {
+        self::$cache[self::cacheKey($sourceName, $sourceId, $targetName, $targetId, $permission)] = $value;
+    }
 
-    public static function isAllowedById($sourceModel, $sourceId, $targetModel, $targetId, $permission)
+    private static function loadCache($sourceName, $sourceId)
     {
-        self::loadCache($sourceModel, $sourceId);
+        if (!isset(self::$cache["$sourceName|$sourceId"])) {
+            foreach (self::find()->where([
+                'source_name' => $sourceName,
+                'source_id' => $sourceId
+            ])->all() as $grant) {
+                self::setCache($sourceName, $sourceId, $grant->target_name, $grant->target_id, $grant->permission,
+                    true);
+            };
+            self::$cache["$sourceName|$sourceId"] = false;
+        }
 
-        if (null === $result = self::getCache($sourceModel, $sourceId, $targetModel, $targetId, $permission)) {
-            $levels = self::permissionLevels();
-            if (isset($levels[$permission])) {
-                $permissionLevel = self::permissionLevels()[$permission];
-                $permissions = array_keys(array_filter(self::permissionLevels(), function ($value) use ($permissionLevel) {
-                    return $value >= $permissionLevel;
-                }));
-            } else {
-                $permissions = [$permission];
-            }
+    }
 
-            $query = self::find();
-            $query->orWhere(['source' => $sourceModel, 'source_id' => $sourceId]);
-            $query->andWhere(['target' => $targetModel, 'target_id' => $targetId, 'permission' => $permissions]);
+    public static function isAllowedById($sourceName, $sourceId, $targetName, $targetId, $permission)
+    {
+        self::loadCache($sourceName, $sourceId);
+
+        if (null === $result = self::getCache($sourceName, $sourceId, $targetName, $targetId, $permission)) {
+            $query = self::find()->where([
+                'source_name' => $sourceName,
+                'source_id' => $sourceId,
+                'target_name' => $targetName,
+                'target_id' => $targetId,
+                'permission' => $permission
+            ]);
 
             $result = $query->exists();
-            self::setCache($sourceModel, $sourceId, $targetModel, $targetId, $permission, $result);
+            self::setCache($sourceName, $sourceId, $targetName, $targetId, $permission, $result);
         }
 
         return $result;
@@ -107,47 +107,26 @@ class Permission extends \yii\db\ActiveRecord
      * @param string $targetClass
      * @param string $permission
      */
-    public static function anyAllowed(ActiveRecordInterface $source, $targetModel, $permission)
+    public static function anyAllowed(ActiveRecordInterface $source, $targetName, $permission)
     {
         $query = self::find();
-        $query->andWhere(['source' => get_class($source), 'source_id' => $source->id]);
-        $query->andWhere(['target' => $targetModel, 'permission' => $permission]);
+        $query->andWhere(['source_name' => get_class($source), 'source_id' => $source->id]);
+        $query->andWhere(['target_name' => $targetName, 'permission' => $permission]);
 
         return self::getDb()->cache(function($db) use ($query) {
             return $query->exists();
         }, 120);
     }
 
-    public static function anyAllowedById($sourceModel, $sourceId, $targetModel, $permission)
+    public static function anyAllowedById($sourceName, $sourceId, $targetName, $permission)
     {
         $query = self::find();
-        $query->andWhere(['source' => $sourceModel, 'source_id' => $sourceId]);
-        $query->andWhere(['target' => $targetModel, 'permission' => $permission]);
+        $query->andWhere(['source_name' => $sourceName, 'source_id' => $sourceId]);
+        $query->andWhere(['target_name' => $targetName, 'permission' => $permission]);
 
         return self::getDb()->cache(function($db) use ($query) {
             return $query->exists();
         }, 120);
-    }
-
-    public static function permissionLabels()
-    {
-        return [
-            self::PERMISSION_READ => \Yii::t('app', 'Read'),
-            self::PERMISSION_WRITE => \Yii::t('app', 'Write/Read'),
-            self::PERMISSION_SHARE => \Yii::t('app', 'Share/Write/Read'),
-            self::PERMISSION_ADMIN => \Yii::t('app', 'Admin/Share/Write/Read'),
-            self::PERMISSION_INSTANTIATE => \Yii::t('app', 'Instantiate')
-        ];
-    }
-
-    public static function permissionLevels()
-    {
-        return [
-            self::PERMISSION_READ => 0,
-            self::PERMISSION_WRITE => 1,
-            self::PERMISSION_SHARE => 2,
-            self::PERMISSION_ADMIN => 3
-        ];
     }
 
     public function rules()

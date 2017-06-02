@@ -8,21 +8,15 @@ interface Authorizable
 {
     /*
      * Get the unique id for this object (unique with respect to objects with the same name).
-     * @return int
+     * @return string
      */
-    public function getId();
+    public function getId(): string;
 
     /*
      * Get the class name for authorization objects of this type.
      * Mainly used to allow subclassing without changing the name.
      * @return string
      */
-    public function getAuthName();
+    public function getAuthName(): string;
 
-    /**
-     * @param string $name The name of the attribute to get.
-     * @return mixed The value of the attribute.
-     * @throws \InvalidArgumentException if the attribute name is not valid for the object.
-     */
-    public function getAuthAttribute($name);
 }

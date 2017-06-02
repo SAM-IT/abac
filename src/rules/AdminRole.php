@@ -9,11 +9,11 @@ use SamIT\abac\Manager;
 use SamIT\abac\interfaces\Rule;
 
 /**
- * Class UserProjectAge
- * This is an example rule.
- * @package prime\auth\rules
+ * Class UserCanReadSelf
+ * @package SamIT\abac\rules
+ * Allow anyone to do dummy operations on anything.
  */
-abstract class UserProjectAge implements Rule
+class AdminRole implements Rule
 {
 
 
@@ -23,7 +23,7 @@ abstract class UserProjectAge implements Rule
      */
     public function getDescription(): string
     {
-        return "your age is > 18.";
+        return "the {target} is you.";
     }
 
     /**
@@ -31,24 +31,29 @@ abstract class UserProjectAge implements Rule
      */
     public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager, string $permission): bool
     {
-        return ($source instanceof User)
-            && ($target instanceof Project)
-            && $source->getAuthAttributes()['age'] > 18;
+
+        $sourceName = $source->getAuthName();
+        $sourceId = $source->getId();
+        foreach ($manager->admins as list($adminName, $adminId)) {
+            if ($sourceName === $adminName && $sourceId == $adminId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @inheritdoc*/
+    public function getTargetNames(): array
+    {
+        return [];
     }
 
     /**
      * @inheritdoc
      */
-    public function getTargetNames(): array
-    {
-        return [Project::class];
-    }
-
-    /**
-     * @return string The name of the permission that this rule grants.
-     */
     public function getPermissions(): array
     {
-        return [Manager::PERMISSION_READ];
+        return [];
     }
 }

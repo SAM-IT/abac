@@ -25,8 +25,6 @@ abstract class Manager
      */
     private $permissionMap = [];
 
-    protected $ruleDirectory = __DIR__ . '/rules';
-
     const MAX_RECURSE = 10;
     const PERMISSION_READ = 'read';
     const PERMISSION_WRITE = 'write';
@@ -34,7 +32,11 @@ abstract class Manager
     const PERMISSION_ADMIN = 'admin';
     const PERMISSION_INSTANTIATE = 'instantiate';
 
-
+    /**
+     * Admins bypass the
+     * @var array
+     */
+    public $admins = [];
 
     /**
      * Checks if a permission is known.
@@ -42,8 +44,9 @@ abstract class Manager
      * @throws \Exception
      */
     private function checkPermissionExists(string $permission) {
+        return true;
         if (!array_key_exists($permission, $this->permissionMap)) {
-            throw new \Exception("Unknown permission.");
+            throw new \Exception("Unknown permission: $permission");
         }
     }
 
@@ -91,20 +94,35 @@ abstract class Manager
     }
 
     /**
+     * @param string $directory
+     * @param string $namespace
+     * @return int The number of rules imported.
+     */
+    public function importRules(string $directory, string $namespace)
+    {
+        $result = 0;
+        // Scan directory.
+        foreach(scandir($directory) as $file) {
+            if (substr_compare($file, '.php', -4, 4, false) === 0) {
+                $rc = new \ReflectionClass($namespace . "\\" . substr($file, 0, -4));
+                if (!$rc->isAbstract()
+                    && $rc->implementsInterface(Rule::class)
+                    && ((null === $c = $rc->getConstructor()) || $c->getNumberOfRequiredParameters() === 0)
+                ) {
+                    $this->addRule($rc->newInstance());
+                    $result++;
+                }
+            }
+        }
+
+        return $result;
+    }
+    /**
      * Adds the included rules
      */
     protected function addCoreRules()
     {
-        $namespace = 'SamIT\\abac\\rules';
-        // Scan directory.
-        foreach(scandir($this->ruleDirectory) as $file) {
-            if (substr_compare($file, '.php', -4, 4, false) === 0) {
-                $rc = new \ReflectionClass($namespace . "\\" . substr($file, 0, -4));
-                if (!$rc->isAbstract() && $rc->getConstructor()->getNumberOfRequiredParameters() === 0) {
-                    $this->addRule($rc->newInstance());
-                }
-            }
-        }
+        return $this->importRules(__DIR__ . '/rules', 'SamIT\\abac\\rules');
     }
 
     /**
@@ -113,28 +131,53 @@ abstract class Manager
      */
     public function addRule(Rule $rule)
     {
-        if (!empty($rule->getTargetTypes())) {
-            foreach ($rule->getTargetTypes() as $class) {
-                $key = "{$rule->getPermissionName()}|$class";
+        if (!empty($rule->getTargetNames())) {
+            foreach ($rule->getTargetNames() as $targetName) {
+                if (!empty($rule->getPermissions())) {
+                    foreach ($rule->getPermissions() as $permission) {
+                        $key = "$permission|$targetName";
+                        if (isset($this->ruleMap[$key])) {
+                            $this->ruleMap[$key][] = $rule;
+                        } else {
+                            $this->ruleMap[$key] = [$rule];
+                        }
+                    }
+                } else {
+                    $key = "|$targetName";
+                    if (isset($this->ruleMap[$key])) {
+                        $this->ruleMap[$key][] = $rule;
+                    } else {
+                        $this->ruleMap[$key] = [$rule];
+                    }
+                }
+
+
+
+            }
+        } else {
+            if (!empty($rule->getPermissions())) {
+                foreach ($rule->getPermissions() as $permission) {
+                    $key = "$permission|";
+                    if (isset($this->ruleMap[$key])) {
+                        $this->ruleMap[$key][] = $rule;
+                    } else {
+                        $this->ruleMap[$key] = [$rule];
+                    }
+                }
+            } else {
+                $key = "|";
                 if (isset($this->ruleMap[$key])) {
                     $this->ruleMap[$key][] = $rule;
                 } else {
                     $this->ruleMap[$key] = [$rule];
                 }
             }
-        } else {
-            $key = "{$rule->getPermissionName()}|";
-            if (isset($this->ruleMap[$key])) {
-                $this->ruleMap[$key][] = $rule;
-            } else {
-                $this->ruleMap[$key] = [$rule];
-            }
         }
-        if (isset($this->permissionMap[$rule->getPermissionName()])) {
-            $this->permissionMap[$rule->getPermissionName()][] = $rule;
-        } else {
-            $this->permissionMap[$rule->getPermissionName()] = [$rule];
-        }
+//        if (isset($this->permissionMap[$rule->getPermissionName()])) {
+//            $this->permissionMap[$rule->getPermissionName()][] = $rule;
+//        } else {
+//            $this->permissionMap[$rule->getPermissionName()] = [$rule];
+//        }
     }
 
     public function __construct()
@@ -184,31 +227,59 @@ abstract class Manager
      */
     private function isAllowedInternal(Authorizable $source, Authorizable $target, string $permission)
     {
-        $this->checkPermissionExists($permission);
-        if ($this->isAllowedExplicit($source->getAuthName(), $source->getId(), $target->getAuthName(),
-            $target->getId(), $permission)) {
-            return true;
-        }
-        // Check specific rules
-        $key = "$permission|{$target->getAuthName()}";
-        if (isset($this->ruleMap[$key])) {
-            /** @var Rule $rule */
-            foreach ($this->ruleMap[$key] as $rule) {
-                if ($rule->execute($source, $target, $this->getEnvironment(), $this)) {
-                    return true;
+        try {
+            $this->checkPermissionExists($permission);
+            if ($this->isAllowedExplicit($source->getAuthName(), $source->getId(), $target->getAuthName(),
+                $target->getId(), $permission)) {
+                return true;
+            }
+            // Check specific rules
+            $key = "$permission|{$target->getAuthName()}";
+            if (isset($this->ruleMap[$key])) {
+                /** @var Rule $rule */
+                foreach ($this->ruleMap[$key] as $rule) {
+                    if ($rule->execute($source, $target, $this->getEnvironment(), $this, $permission)) {
+                        return true;
+                    }
                 }
             }
-        }
 
-        // Check generic rules.
-        $key = "$permission|";
-        if (isset($this->ruleMap[$key])) {
-            /** @var Rule $rule */
-            foreach ($this->ruleMap[$key] as $rule) {
-                if ($rule->execute($source, $target, $this->getEnvironment(), $this)) {
-                    return true;
+            // Check rules with no target.
+            $key = "$permission|";
+            if (isset($this->ruleMap[$key])) {
+                /** @var Rule $rule */
+                foreach ($this->ruleMap[$key] as $rule) {
+                    if ($rule->execute($source, $target, $this->getEnvironment(), $this, $permission)) {
+                        return true;
+                    }
                 }
             }
+
+            // Check rules with no permission.
+            $key = "|{$target->getAuthName()}";
+            if (isset($this->ruleMap[$key])) {
+                /** @var Rule $rule */
+                foreach ($this->ruleMap[$key] as $rule) {
+                    if ($rule->execute($source, $target, $this->getEnvironment(), $this, $permission)) {
+                        return true;
+                    }
+                }
+            }
+
+            // Check generic rules.
+            if ($key !== "|") {
+                $key = "|";
+                if (isset($this->ruleMap[$key])) {
+                    /** @var Rule $rule */
+                    foreach ($this->ruleMap[$key] as $rule) {
+                        if ($rule->execute($source, $target, $this->getEnvironment(), $this, $permission)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        } finally {
+//            var_dump($key, $rule); die();
         }
         return false;
 

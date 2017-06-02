@@ -3,38 +3,37 @@
 
 namespace SamIT\abac\rules;
 
+
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\Manager;
 use SamIT\abac\interfaces\Rule;
 
 /**
- * Class UserWriteImpliesReadRule
- * This is an example rule.
- * @package prime\auth\rules
+ * Class UserCanReadSelf
+ * @package SamIT\abac\rules
+ * Allow anyone to do dummy operations on anything.
  */
-abstract class UserWriteImpliesReadRule implements Rule
+class AnyoneCanDummy implements Rule
 {
 
 
+
     /**
-     * @return string A human readable description of what this rule does.
+     * @inheritdoc
      */
     public function getDescription(): string
     {
-        return "can write the {target}.";
+        return "the {target} is you.";
     }
 
     /**
-     * @param Authorizable $source
-     * @param Authorizable $target
+     * @param \SamIT\abac\interfaces\Authorizable $source
+     * @param \SamIT\abac\interfaces\Authorizable $target
      * @return boolean
      */
     public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager, string $permission): bool
     {
-        
-        return ($source instanceof User)
-        && ($target instanceof User)
-        && $manager->isAllowed($source, $target, Manager::PERMISSION_WRITE);
+        return true;
     }
 
     /**
@@ -42,7 +41,7 @@ abstract class UserWriteImpliesReadRule implements Rule
      */
     public function getTargetNames(): array
     {
-        return [User::class];
+        return [];
     }
 
     /**
@@ -50,6 +49,6 @@ abstract class UserWriteImpliesReadRule implements Rule
      */
     public function getPermissions(): array
     {
-        return [Manager::PERMISSION_READ];
+        return ['dummy'];
     }
 }

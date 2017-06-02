@@ -17,17 +17,15 @@ abstract class UserCanReadSelf implements Rule
     /**
      * @inheritdoc
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return "the {target} is you.";
     }
 
     /**
-     * @param \SamIT\abac\interfaces\Authorizable $source
-     * @param \SamIT\abac\interfaces\Authorizable $target
-     * @return boolean
+     * @inheritdoc
      */
-    public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager)
+    public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager, string $permission): bool
     {
         return ($source instanceof User)
             && ($target instanceof User)
@@ -37,7 +35,7 @@ abstract class UserCanReadSelf implements Rule
     /**
      * @return string[] An array of class names that this rule applies to.
      */
-    public function getTargetTypes()
+    public function getTargetNames(): array
     {
         return [User::class];
     }
@@ -45,8 +43,8 @@ abstract class UserCanReadSelf implements Rule
     /**
      * @return string The name of the permission that this rule grants.
      */
-    public function getPermissionName()
+    public function getPermissions(): array
     {
-        return Manager::PERMISSION_READ;
+        return [Manager::PERMISSION_READ];
     }
 }

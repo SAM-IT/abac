@@ -1,7 +1,7 @@
 <?php
 
 
-namespace prime\auth\rules;
+namespace SamIT\abac\rules;
 
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\Manager;
@@ -20,7 +20,7 @@ class WriteImpliesReadRule implements Rule
      * @inheritdoc
      * "you can ... if [description]"
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return "you can [write] it.";
     }
@@ -30,7 +30,7 @@ class WriteImpliesReadRule implements Rule
      * @param \SamIT\abac\interfaces\Authorizable $target
      * @return boolean
      */
-    public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager)
+    public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager, string $permission): bool
     {
         
         return $manager->isAllowed($source, $target, Manager::PERMISSION_WRITE);
@@ -39,7 +39,7 @@ class WriteImpliesReadRule implements Rule
     /**
      * @return string[] An array of class names that this rule applies to.
      */
-    public function getTargetTypes()
+    public function getTargetNames(): array
     {
         return [];
     }
@@ -47,8 +47,8 @@ class WriteImpliesReadRule implements Rule
     /**
      * @return string The name of the permission that this rule grants.
      */
-    public function getPermissionName()
+    public function getPermissions(): array
     {
-        return Manager::PERMISSION_READ;
+        return [Manager::PERMISSION_READ];
     }
 }

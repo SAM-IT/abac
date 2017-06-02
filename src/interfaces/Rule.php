@@ -10,24 +10,26 @@ use SamIT\abac\Manager;
 interface Rule
 {
     /**
-     * @return string The name of the permission that this rule grants.
+     * @return string[] The names of the permission that this rule grants. If empty, this rule applies to all permissions.
      */
-    public function getPermissionName();
+    public function getPermissions(): array;
 
     /**
-     * @return string[] An array of class names that this rule applies to. 
+     * @return string[] An array of class names that this rule applies to. If empty, this rule applies to all target types.
      */
-    public function getTargetTypes();
+    public function getTargetNames(): array;
     
     /**
      * @return string A human readable description of what this rule does.
      * Finish the sentence: "You can [permission] the [object] if.."
      */
-    public function getDescription();
+    public function getDescription(): string;
     /**
      * @param Authorizable $source
      * @param Authorizable $target
-     * @return boolean
+     * @param \ArrayAccess $environment The environment
+     * @param Manager $manager The auth manager, use this for recursive lookups.
+     * @param string $permission The requested permission
      */
-    public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager);
+    public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager, string $permission): bool;
 }
