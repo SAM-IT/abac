@@ -104,4 +104,37 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\CheckAccessInterf
         $source = $this->getUser($userId);
         return $this->isAllowed($source, $params['target'] ?? new AuthorizableDummy(), $permissionName);
     }
+
+
+    /**
+     * This function should return an array of associative arrays with grants.
+     * Each param maybe NULL, which implies "don't care".
+     * An empty string is not the same and must be matched exactly.
+     * @param string|null $sourceName
+     * @param string|null $sourceId
+     * @param string|null $targetName
+     * @param string|null $targetId
+     * @param string|null $permission
+     * @return array
+     */
+    public function findExplicit(
+        string $sourceName = null,
+        string $sourceId = null,
+        string $targetName = null,
+        string $targetId = null,
+        string $permission = null
+    ): array {
+
+        // We use array_filter to remove NULL, not empty strings.
+        return Permission::find()
+            ->andWhere(array_filter([
+                'source_name' => $sourceName,
+                'source_id' => $sourceId,
+                'target_name' => $targetName,
+                'target_id' => $targetId,
+                'permission' => $permission
+            ], function($e) { return $e !== null; }))
+            ->asArray()
+            ->all();
+    }
 }

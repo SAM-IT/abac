@@ -23,7 +23,7 @@ class AnyoneCanDummy implements Rule
      */
     public function getDescription(): string
     {
-        return "the {target} is you.";
+        return "true.";
     }
 
     /**

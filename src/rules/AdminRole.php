@@ -23,7 +23,7 @@ class AdminRole implements Rule
      */
     public function getDescription(): string
     {
-        return "the {target} is you.";
+        return "the [target] is you.";
     }
 
     /**
@@ -31,7 +31,6 @@ class AdminRole implements Rule
      */
     public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager, string $permission): bool
     {
-
         $sourceName = $source->getAuthName();
         $sourceId = $source->getId();
         foreach ($manager->admins as list($adminName, $adminId)) {
