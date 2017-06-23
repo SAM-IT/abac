@@ -3,6 +3,7 @@
 namespace SamIT\abac;
 
 use SamIT\abac\interfaces\Authorizable;
+use SamIT\abac\interfaces\Permission;
 use SamIT\abac\interfaces\Rule;
 
 /**
@@ -81,14 +82,6 @@ abstract class Manager
     public function revokeById(string $sourceName, string $sourceId, string $targetName, string $targetId, string $permission)
     {
         $this->checkPermissionExists($permission);
-
-        if (!is_subclass_of($sourceName, Authorizable::class)) {
-            throw new \Exception("Cannot grant access for unknown class: " . $sourceName);
-        }
-
-        if (!is_subclass_of($targetName, Authorizable::class)) {
-            throw new \Exception("Cannot grant access to unknown class: " . $targetName);
-        }
 
         $this->revokeInternal($sourceName, $sourceId, $targetName, $targetId, $permission);
     }
@@ -349,7 +342,7 @@ abstract class Manager
      * @param string|null $targetName
      * @param string|null $targetId
      * @param string|null $permission
-     * @return array
+     * @return Permission[]
      */
     abstract public function findExplicit(string $sourceName = null, string $sourceId = null, string $targetName = null, string $targetId = null, string $permission = null): array;
 

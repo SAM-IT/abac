@@ -65,7 +65,7 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\CheckAccessInterf
         Permission::deleteAll([
             'source_name' => $sourceName,
             'source_id' => $sourceId,
-            'target_name' => $targetId,
+            'target_name' => $targetName,
             'target_id' => $targetId,
             'permission' => $permission
         ]);
@@ -134,7 +134,7 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\CheckAccessInterf
                 'target_id' => $targetId,
                 'permission' => $permission
             ], function($e) { return $e !== null; }))
-            ->asArray()
+            ->select(['source_name', 'source_id', 'target_name', 'target_id', 'permission'])
             ->all();
     }
 }
