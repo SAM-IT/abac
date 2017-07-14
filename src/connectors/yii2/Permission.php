@@ -5,6 +5,8 @@ namespace SamIT\abac\connectors\yii2;
 use prime\models\ActiveRecord;
 use prime\models\ar\Project;
 use prime\models\ar\User;
+use SamIT\abac\interfaces\Authorizable;
+use SamIT\abac\interfaces\Permission as PermissionInterface;
 use yii\db\ActiveRecordInterface;
 
 /**
@@ -16,8 +18,9 @@ use yii\db\ActiveRecordInterface;
  * @property string $target
  * @property string $target_id
  */
-class Permission extends \yii\db\ActiveRecord
+class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Authorizable
 {
+    use ActiveRecordAuthorizableTrait;
     // Cache for the results for the anyAllowed lookup.
     private static $anyCache = [];
     // Cache for the results for the isAllowed loookup.
@@ -143,5 +146,25 @@ class Permission extends \yii\db\ActiveRecord
         return '{{%permission}}';
     }
 
+
+    public function getSourceName(): string
+    {
+        return $this->getAttribute('source_name');
+    }
+
+    public function getSourceId(): string
+    {
+        return $this->getAttribute('source_id');
+    }
+
+    public function getTargetName(): string
+    {
+        return $this->getAttribute('target_name');
+    }
+
+    public function getTargetId(): string
+    {
+        return $this->getAttribute('target_id');
+    }
 
 }
