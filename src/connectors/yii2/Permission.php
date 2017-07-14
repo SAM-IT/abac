@@ -26,13 +26,6 @@ class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Au
     // Cache for the results for the isAllowed loookup.
     private static $cache = [];
 
-    const PERMISSION_READ = 'read';
-    const PERMISSION_WRITE = 'write';
-    const PERMISSION_SHARE = 'share';
-    const PERMISSION_ADMIN = 'admin';
-    const PERMISSION_INSTANTIATE = 'instantiate';
-
-
     public function attributeLabels()
     {
         return [
@@ -110,18 +103,39 @@ class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Au
      * @param string $targetClass
      * @param string $permission
      */
-    public static function anyAllowed(ActiveRecordInterface $source, $targetName, $permission)
+    public static function anyAllowed(Authorizable $source, $targetName, $permission): bool
     {
         $query = self::find();
-        $query->andWhere(['source_name' => get_class($source), 'source_id' => $source->id]);
-        $query->andWhere(['target_name' => $targetName, 'permission' => $permission]);
+        $query->andWhere([
+            'source_name' => $source->getAuthName(),
+            'source_id' => $source->getId(),
+            'target_name' => $targetName,
+            'permission' => $permission
+        ]);
+        $query->andWhere([]);
 
         return self::getDb()->cache(function($db) use ($query) {
             return $query->exists();
         }, 120);
     }
 
-    public static function anyAllowedById($sourceName, $sourceId, $targetName, $permission)
+    public static function anySourceAllowed(Authorizable $target, $sourceName = null, $permission = null): bool
+    {
+        $query = self::find();
+        $query->andWhere([
+            'target_name' => $target->getAuthName(),
+            'target_id' => $target->getId(),
+
+        ]);
+        $query->andFilterWhere(['source_name' => $sourceName]);
+        $query->andFilterWhere(['permission' => $permission]);
+
+        return self::getDb()->cache(function($db) use ($query) {
+            return $query->exists();
+        }, 120);
+    }
+
+    public static function anyAllowedById($sourceName, $sourceId, $targetName, $permission): bool
     {
         $query = self::find();
         $query->andWhere(['source_name' => $sourceName, 'source_id' => $sourceId]);
