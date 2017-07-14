@@ -205,11 +205,13 @@ abstract class Manager
      * @param string $permission Permission
      * @return Authorizable[] The elements in $targets for which $source is allowed $permission.
      */
-    public function filter(Authorizable $source, array $targets, string $permission)
+    public function filter(Authorizable $source, iterable $targets, string $permission)
     {
-        return array_filter($targets, function(Authorizable $target) use ($source, $permission) {
-            return $this->isAllowed($source, $target, $permission);
-        });
+        foreach($targets as $key => $target) {
+            if ($this->isAllowed($source, $target, $permission)) {
+                yield $key => $target;
+            }
+        }
     }
 
     /**
