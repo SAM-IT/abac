@@ -47,9 +47,9 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\CheckAccessInterf
     protected function grantInternal(string $sourceName, string $sourceId, string $targetName, string $targetId, string $permission): void
     {
         $perm = new Permission();
-        $perm->source = $sourceName;
+        $perm->source_name = $sourceName;
         $perm->source_id = $sourceId;
-        $perm->target = $targetName;
+        $perm->target_name = $targetName;
         $perm->target_id = $targetId;
         $perm->permission = $permission;
         if (!$perm->save()) {

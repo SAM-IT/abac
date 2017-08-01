@@ -8,6 +8,7 @@ use prime\models\ar\User;
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Permission as PermissionInterface;
 use yii\db\ActiveRecordInterface;
+use yii\validators\StringValidator;
 
 /**
  * Class Permission
@@ -149,9 +150,9 @@ class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Au
     public function rules()
     {
         return [
-            [['source', 'source_id', 'target', 'target_id', 'permission'], 'required'],
-            [['source', 'source_id', 'target', 'target_id'], 'unique', 'targetAttribute' => ['source', 'source_id', 'target', 'target_id']],
-            [['permission'], 'in', 'range' => array_keys(self::permissionLabels())]
+            [['source_name', 'source_id', 'target_name', 'target_id', 'permission'], 'required'],
+            [['source_name', 'source_id', 'target_name', 'target_id'], 'unique', 'targetAttribute' => ['source_name', 'source_id', 'target_name', 'target_id']],
+            [['permission'], StringValidator::class, 'min' => 1]
         ];
     }
 

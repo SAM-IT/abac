@@ -18,8 +18,6 @@ trait ActiveRecordAuthorizableTrait
 
     public function getAuthName(): string
     {
-        $class = get_class($this);
-        $pos = strrpos($class, '\\');
-        return substr($class, $pos === false ? 0 : $pos + 1);
+        return get_class($this);
     }
 }
