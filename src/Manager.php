@@ -21,10 +21,6 @@ abstract class Manager
      * @var
      */
     private $ruleMap = [];
-    /**
-     * @var array
-     */
-    private $permissionMap = [];
 
     const MAX_RECURSE = 10;
     const PERMISSION_READ = 'read';
@@ -39,50 +35,23 @@ abstract class Manager
      */
     public $admins = [];
 
-    /**
-     * Checks if a permission is known.
-     * @param string $permission
-     * @throws \Exception
-     */
-    private function checkPermissionExists(string $permission) {
-        return true;
-        if (!array_key_exists($permission, $this->permissionMap)) {
-            throw new \Exception("Unknown permission: $permission");
-        }
-    }
-
     public function grant(Authorizable $source, Authorizable $target, string $permission)
     {
-        $this->checkPermissionExists($permission);
         $this->grantInternal($source->getAuthName(), $source->getId(), $target->getAuthName(), $target->getId(), $permission);
     }
 
     public function grantById(string $sourceName, string $sourceId, string $targetName, string $targetId, string $permission)
     {
-        $this->checkPermissionExists($permission);
-
-        if (!is_subclass_of($sourceName, Authorizable::class)) {
-            throw new \Exception("Cannot grant access for unknown class: " . $sourceName);
-        }
-
-        if (!is_subclass_of($targetName, Authorizable::class)) {
-            throw new \Exception("Cannot grant access to unknown class: " . $targetName);
-        }
-
         $this->grantInternal($sourceName, $sourceId, $targetName, $targetId, $permission);
-
     }
 
     public function revoke(Authorizable $source, Authorizable $target, string $permission)
     {
-        $this->checkPermissionExists($permission);
         $this->revokeInternal($source->getAuthName(), $source->getId(), $target->getAuthName(), $target->getId(), $permission);
     }
 
     public function revokeById(string $sourceName, string $sourceId, string $targetName, string $targetId, string $permission)
     {
-        $this->checkPermissionExists($permission);
-
         $this->revokeInternal($sourceName, $sourceId, $targetName, $targetId, $permission);
     }
 
@@ -205,11 +174,13 @@ abstract class Manager
      * @param string $permission Permission
      * @return Authorizable[] The elements in $targets for which $source is allowed $permission.
      */
-    public function filter(Authorizable $source, array $targets, string $permission)
+    public function filter(Authorizable $source, iterable $targets, string $permission)
     {
-        return array_filter($targets, function(Authorizable $target) use ($source, $permission) {
-            return $this->isAllowed($source, $target, $permission);
-        });
+        foreach($targets as $key => $target) {
+            if ($this->isAllowed($source, $target, $permission)) {
+                yield $key => $target;
+            }
+        }
     }
 
     /**
