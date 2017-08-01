@@ -192,7 +192,6 @@ abstract class Manager
     private function isAllowedInternal(Authorizable $source, Authorizable $target, string $permission)
     {
         try {
-            $this->checkPermissionExists($permission);
             if ($this->isAllowedExplicit($source->getAuthName(), $source->getId(), $target->getAuthName(),
                 $target->getId(), $permission)) {
                 return true;
