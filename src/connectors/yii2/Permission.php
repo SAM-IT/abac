@@ -14,9 +14,9 @@ use yii\validators\StringValidator;
  * Class Permission
  * @package app\models
  * @property string $permission
- * @property string $source
+ * @property string $source_name
  * @property string $source_id
- * @property string $target
+ * @property string $target_name
  * @property string $target_id
  */
 class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Authorizable
@@ -68,7 +68,7 @@ class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Au
             foreach (self::find()->where([
                 'source_name' => $sourceName,
                 'source_id' => $sourceId
-            ])->all() as $grant) {
+            ])->each() as $grant) {
                 self::setCache($sourceName, $sourceId, $grant->target_name, $grant->target_id, $grant->permission,
                     true);
             };
@@ -182,4 +182,13 @@ class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Au
         return $this->getAttribute('target_id');
     }
 
+    public function getSource(): ?Authorizable
+    {
+        return $this->getSourceName()::findOne($this->getSourceId());
+    }
+
+    public function getTarget(): ?Authorizable
+    {
+        return $this->getTargetName()::findOne($this->getTargetId());
+    }
 }

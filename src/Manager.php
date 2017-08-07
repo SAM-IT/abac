@@ -28,6 +28,7 @@ abstract class Manager
     const PERMISSION_SHARE = 'share';
     const PERMISSION_ADMIN = 'admin';
     const PERMISSION_INSTANTIATE = 'instantiate';
+    const PERMISSION_REVOKE = 'revoke';
 
     /**
      * Admins bypass the

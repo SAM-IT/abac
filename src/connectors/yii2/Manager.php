@@ -46,11 +46,20 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\CheckAccessInterf
      */
     protected function grantInternal(string $sourceName, string $sourceId, string $targetName, string $targetId, string $permission): void
     {
-        $perm = new Permission();
-        $perm->source_name = $sourceName;
-        $perm->source_id = $sourceId;
-        $perm->target_name = $targetName;
-        $perm->target_id = $targetId;
+        if (
+            null === $perm = Permission::find()->where([
+                'source_name' => $sourceName,
+                'source_id' => $sourceId,
+                'target_name' => $targetName,
+                'target_id' => $targetId
+            ])->one()
+        ) {
+            $perm = new Permission();
+            $perm->source_name = $sourceName;
+            $perm->source_id = $sourceId;
+            $perm->target_name = $targetName;
+            $perm->target_id = $targetId;
+        }
         $perm->permission = $permission;
         if (!$perm->save()) {
             throw new \Exception("Failed to grant permission.");
@@ -79,7 +88,8 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\CheckAccessInterf
     protected function getEnvironment()
     {
         return new \ArrayObject([
-            'day' => 'Sunday',
+            'app' => \Yii::$app,
+            'identity' => \Yii::$app->user->identity
         ]);
     }
 
@@ -134,7 +144,6 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\CheckAccessInterf
                 'target_id' => $targetId,
                 'permission' => $permission
             ], function($e) { return $e !== null; }))
-            ->select(['source_name', 'source_id', 'target_name', 'target_id', 'permission'])
             ->all();
     }
 }
