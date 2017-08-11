@@ -23,12 +23,56 @@ abstract class Manager
     private $ruleMap = [];
 
     const MAX_RECURSE = 10;
+
+    /**
+     * PERMISSIONS
+     * Below is a list of constant identifying common used permissions.
+     * You are free to use any string as a named permission, or alternatively
+     * define constants within your own application, or in a subclass.
+     */
+
+    /**
+     * List an entity; this means getting its ID and some textual identifier / display name.
+     */
+    const PERMISSION_LIST = 'list';
+    /**
+     * Read an entity, this includes all fields readable by any user and can contain privileged information.
+     */
     const PERMISSION_READ = 'read';
+
+    /**
+     * Write an entity, this includes all fields writable by any user.
+     * Often used with a rule that allows delete permission to anyone with write permission.
+     * Often used with a rule that allows read permission to anyone with write permission.
+     */
     const PERMISSION_WRITE = 'write';
-    const PERMISSION_SHARE = 'share';
+
+    /**
+     * Delete an entity.
+     */
+    const PERMISSION_DELETE = 'delete';
+
+    /**
+     * Allows someone to administer an entity.
+     * Often used with a rule that allows admins to do anything.
+     */
     const PERMISSION_ADMIN = 'admin';
-    const PERMISSION_INSTANTIATE = 'instantiate';
+
+    /**
+     * Allows someone create an entity.
+     */
+    const PERMISSION_CREATE = 'create';
+
+    /**
+     * Allows someone to revoke permissions on an entity
+     */
     const PERMISSION_REVOKE = 'revoke';
+
+    /**
+     * Allows someone to grant permissions on an entity.
+     * Often combined with a check of the permission to be granted, ie you can't grant what you can't do.
+     */
+    const PERMISSION_GRANT = 'grant';
 
     /**
      * Admins bypass the
@@ -148,7 +192,7 @@ abstract class Manager
         $this->addCoreRules();
     }
 
-    private $depth = 0;
+    protected $depth = 0;
 
     /**
      * @param Authorizable $source The source for authorization, probably the user, group or role.
@@ -202,7 +246,7 @@ abstract class Manager
             if (isset($this->ruleMap[$key])) {
                 /** @var Rule $rule */
                 foreach ($this->ruleMap[$key] as $rule) {
-                    if ($rule->execute($source, $target, $this->getEnvironment(), $this, $permission)) {
+                    if ($this->execute($rule, $source, $target, $permission)) {
                         return true;
                     }
                 }
@@ -213,7 +257,7 @@ abstract class Manager
             if (isset($this->ruleMap[$key])) {
                 /** @var Rule $rule */
                 foreach ($this->ruleMap[$key] as $rule) {
-                    if ($rule->execute($source, $target, $this->getEnvironment(), $this, $permission)) {
+                    if ($this->execute($rule, $source, $target, $permission)) {
                         return true;
                     }
                 }
@@ -224,7 +268,7 @@ abstract class Manager
             if (isset($this->ruleMap[$key])) {
                 /** @var Rule $rule */
                 foreach ($this->ruleMap[$key] as $rule) {
-                    if ($rule->execute($source, $target, $this->getEnvironment(), $this, $permission)) {
+                    if ($this->execute($rule, $source, $target, $permission)) {
                         return true;
                     }
                 }
@@ -236,7 +280,7 @@ abstract class Manager
                 if (isset($this->ruleMap[$key])) {
                     /** @var Rule $rule */
                     foreach ($this->ruleMap[$key] as $rule) {
-                        if ($rule->execute($source, $target, $this->getEnvironment(), $this, $permission)) {
+                        if ($this->execute($rule, $source, $target, $permission)) {
                             return true;
                         }
                     }
@@ -247,6 +291,11 @@ abstract class Manager
         }
         return false;
 
+    }
+
+    protected function execute(Rule $rule, Authorizable $source, Authorizable $target, string $permission): bool
+    {
+        return $rule->execute($source, $target, $this->getEnvironment(), $this, $permission);
     }
 
     /**

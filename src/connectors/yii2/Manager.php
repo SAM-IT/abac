@@ -5,25 +5,76 @@ namespace SamIT\abac\connectors\yii2;
 
 
 use SamIT\abac\AuthorizableDummy;
+use SamIT\abac\interfaces\Authorizable;
+use SamIT\abac\interfaces\Rule;
 
 class Manager extends \SamIT\abac\Manager implements \yii\rbac\CheckAccessInterface, \yii\base\Configurable
 {
+    /**
+     * @var bool whether to log detailed information on decision making based on rules.
+     */
+    public $debug = YII_DEBUG;
+
     /**
      * @var string The ActiveRecord class for users.
      */
     protected $userClass;
 
-    /**
-     * @return string[] The list of valid permission names. Can be static or could be retrieved from a database or
-     * other dynamic storage.
-     */
-    public function permissionNames()
+    public function isAllowed(Authorizable $source, Authorizable $target, string $permission)
     {
-        return [
-            'read',
-            'write'
-        ];
+        $logName = function(Authorizable $authorizable) {
+            return array_slice(explode('\\', $authorizable->getAuthName()), -1, 1)[0] . "({$authorizable->getId()})";
+        };
+
+        if ($this->debug) {
+            $message = str_repeat('>', $this->depth) . strtr("[source] requesting [permission] permission on [target]", [
+                '[permission]' => $permission,
+                '[target]' => $logName($target),
+                '[source]' => $logName($source)
+            ]);
+            if ($this->depth > 0) {
+              \Yii::trace($message, 'abac');
+            } else {
+                \Yii::info($message, 'abac');
+            }
+        }
+        $result = parent::isAllowed($source, $target, $permission);
+
+        if ($this->debug) {
+            $message = str_repeat('>', $this->depth) . ($result ? 'Allowing' : 'Denying') . strtr(" [source] [permission] permission on [target]", [
+                '[permission]' => $permission,
+                '[target]' => $logName($target),
+                '[source]' => $logName($source)
+            ]);
+            if ($this->depth > 0) {
+                \Yii::trace($message, 'abac');
+            } else {
+                \Yii::info($message, 'abac');
+            }
+        }
+        return $result;
+
     }
+
+
+    protected function execute(Rule $rule, Authorizable $source, Authorizable $target, string $permission): bool
+    {
+        $result = parent::execute($rule, $source, $target, $permission);
+
+        if ($this->debug) {
+            $ruleName = get_class($rule);
+            $template = ($result ? 'TRUE:' : 'FALSE: ') . "You can [permission] the [target] if {$rule->getDescription()} ($ruleName)";
+            $message = strtr($template, [
+                '[permission]' => $permission,
+                '[target]' => "{$target->getAuthName()}({$target->getId()})",
+            ]);
+
+            \Yii::trace($message, 'abac');
+        }
+        return $result;
+
+    }
+
 
     public function __construct($config = [])
     {
