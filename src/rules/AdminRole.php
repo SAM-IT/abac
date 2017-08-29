@@ -53,6 +53,6 @@ class AdminRole implements Rule
      */
     public function getPermissions(): array
     {
-        return [];
+        return [Manager::PERMISSION_ADMIN];
     }
 }

@@ -22,9 +22,8 @@ use yii\validators\StringValidator;
 class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Authorizable
 {
     use ActiveRecordAuthorizableTrait;
-    // Cache for the results for the anyAllowed lookup.
-    private static $anyCache = [];
-    // Cache for the results for the isAllowed loookup.
+
+        // Cache for the results for the isAllowed loookup.
     private static $cache = [];
 
     public function attributeLabels()
@@ -36,14 +35,20 @@ class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Au
 
 
 
-    private static function getCache($sourceName, $sourceId, $targetName, $targetId, $permission)
+    private static function getCache($sourceName, $sourceId, $targetName, $targetId, $permission): ?bool
     {
         if (!isset($targetId)) {
             throw new \Exception('targetId is required');
         }
-        \Yii::info("Checking from cache: $sourceName [$sourceId] --> $targetName [$targetId]");
+        if (\Yii::$app->authManager->debug) {
+            \Yii::info("Checking from cache: $sourceName [$sourceId] --($permission)--> $targetName [$targetId]", 'abac');
+        }
         $key = self::cacheKey($sourceName, $sourceId, $targetName, $targetId, $permission);
-        return self::$cache[$key] ?? self::$cache["$sourceName|$sourceId"] ?? null;
+        $result = self::$cache[$key] ?? self::$cache["$sourceName|$sourceId"] ?? null;
+        if (\Yii::$app->authManager->debug) {
+            \Yii::info("Returning: " . ($result ? "true" : (is_null($result) ? "NULL" : "false")), 'abac');
+        }
+        return $result;
     }
 
     private static function cacheKey($sourceName, $sourceId, $targetName, $targetId, $permission): string
@@ -81,7 +86,7 @@ class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Au
     {
         self::loadCache($sourceName, $sourceId);
 
-        if (null === $result = self::getCache($sourceName, $sourceId, $targetName, $targetId, $permission)) {
+        if (null === ($result = self::getCache($sourceName, $sourceId, $targetName, $targetId, $permission))) {
             $query = self::find()->where([
                 'source_name' => $sourceName,
                 'source_id' => $sourceId,
@@ -106,45 +111,49 @@ class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Au
      */
     public static function anyAllowed(Authorizable $source, $targetName, $permission): bool
     {
-        $query = self::find();
-        $query->andWhere([
-            'source_name' => $source->getAuthName(),
-            'source_id' => $source->getId(),
-            'target_name' => $targetName,
-            'permission' => $permission
-        ]);
-        $query->andWhere([]);
-
-        return self::getDb()->cache(function($db) use ($query) {
-            return $query->exists();
-        }, 120);
+        return self::anyAllowedById($source->getAuthName(), $source->getId(), $targetName, $permission);
     }
+
+    private static $anySourceAllowedCache = [];
 
     public static function anySourceAllowed(Authorizable $target, $sourceName = null, $permission = null): bool
     {
-        $query = self::find();
-        $query->andWhere([
-            'target_name' => $target->getAuthName(),
-            'target_id' => $target->getId(),
+        $key  = implode('|', [$target->getAuthName(), $target->getId(), $sourceName, $permission]);
 
-        ]);
-        $query->andFilterWhere(['source_name' => $sourceName]);
-        $query->andFilterWhere(['permission' => $permission]);
+        if (!isset(self::$anySourceAllowedCache[$key])) {
+            $query = self::find();
+            $query->andWhere([
+                'target_name' => $target->getAuthName(),
+                'target_id' => $target->getId(),
 
-        return self::getDb()->cache(function($db) use ($query) {
-            return $query->exists();
-        }, 120);
+            ]);
+            $query->andFilterWhere(['source_name' => $sourceName]);
+            $query->andFilterWhere(['permission' => $permission]);
+
+            self::$anySourceAllowedCache[$key] = self::getDb()->cache(function ($db) use ($query) {
+                return $query->exists();
+            }, 120);
+        }
+
+        return self::$anySourceAllowedCache[$key];
     }
 
-    public static function anyAllowedById($sourceName, $sourceId, $targetName, $permission): bool
-    {
-        $query = self::find();
-        $query->andWhere(['source_name' => $sourceName, 'source_id' => $sourceId]);
-        $query->andWhere(['target_name' => $targetName, 'permission' => $permission]);
+    // Cache for the results for the anyAllowed lookup.
+    private static $anyAllowedCache = [];
 
-        return self::getDb()->cache(function($db) use ($query) {
-            return $query->exists();
-        }, 120);
+    public static function anyAllowedById(string $sourceName, string $sourceId, string $targetName, string $permission): bool
+    {
+        $key  = implode('|', [$sourceName, $sourceId, $targetName, $permission]);
+        if (!isset(self::$anyAllowedCache[$key])){
+            $query = self::find();
+            $query->andWhere(['source_name' => $sourceName, 'source_id' => $sourceId]);
+            $query->andWhere(['target_name' => $targetName, 'permission' => $permission]);
+            self::$anyAllowedCache[$key] = self::getDb()->cache(function($db) use ($query) {
+                return $query->exists();
+            }, 120);
+        }
+
+        return self::$anyAllowedCache[$key];
     }
 
     public function rules()
