@@ -130,9 +130,7 @@ class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Au
             $query->andFilterWhere(['source_name' => $sourceName]);
             $query->andFilterWhere(['permission' => $permission]);
 
-            self::$anySourceAllowedCache[$key] = self::getDb()->cache(function ($db) use ($query) {
-                return $query->exists();
-            }, 120);
+            self::$anySourceAllowedCache[$key] = $query->exists();
         }
 
         return self::$anySourceAllowedCache[$key];
@@ -200,4 +198,20 @@ class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Au
     {
         return $this->getTargetName()::findOne($this->getTargetId());
     }
+
+    public static function find()
+    {
+        return \Yii::createObject(PermissionQuery::className(), [get_called_class()]);
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        // Clear all caches.
+        self::$anyAllowedCache = [];
+        self::$anySourceAllowedCache = [];
+        self::$cache = [];
+    }
+
+
 }
