@@ -97,23 +97,19 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\CheckAccessInterf
      */
     protected function grantInternal(string $sourceName, string $sourceId, string $targetName, string $targetId, string $permission): void
     {
-        if (
-            null === $perm = Permission::find()->where([
-                'source_name' => $sourceName,
-                'source_id' => $sourceId,
-                'target_name' => $targetName,
-                'target_id' => $targetId
-            ])->one()
-        ) {
+        try {
             $perm = new Permission();
             $perm->source_name = $sourceName;
             $perm->source_id = $sourceId;
             $perm->target_name = $targetName;
             $perm->target_id = $targetId;
-        }
-        $perm->permission = $permission;
-        if (!$perm->save()) {
-            throw new \Exception("Failed to grant permission.");
+            $perm->permission = $permission;
+            if (!$perm->save()) {
+                throw new \Exception("Failed to grant permission.");
+            }
+        } catch (\yii\db\Exception $e) {
+            throw $e;
+            throw new \Exception("Failed to grant permission.", $e);
         }
     }
 

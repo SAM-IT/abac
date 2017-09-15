@@ -158,7 +158,7 @@ class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Au
     {
         return [
             [['source_name', 'source_id', 'target_name', 'target_id', 'permission'], 'required'],
-            [['source_name', 'source_id', 'target_name', 'target_id'], 'unique', 'targetAttribute' => ['source_name', 'source_id', 'target_name', 'target_id']],
+            [['source_name', 'source_id', 'target_name', 'target_id', 'permission'], 'unique', 'targetAttribute' => ['source_name', 'source_id', 'target_name', 'target_id', 'permission']],
             [['permission'], StringValidator::class, 'min' => 1]
         ];
     }
