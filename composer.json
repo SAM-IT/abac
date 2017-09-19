@@ -14,5 +14,7 @@
             "SamIT\\abac\\": ["src/"]
         }
     },
-    "require": {}
+    "require": {
+        "nikic/iter": "^1.5"
+    }
 }

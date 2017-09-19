@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SamIT\abac;
 
+use function iter\rewindable\filter;
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Permission;
 use SamIT\abac\interfaces\Rule;
@@ -225,11 +226,10 @@ abstract class Manager
         if (!isset($source)) {
             return new \EmptyIterator();
         }
-        foreach($targets as $key => $target) {
-            if ($this->isAllowed($source, $target, $permission)) {
-                yield $key => $target;
-            }
-        }
+
+        return filter(function($target) use ($source, $permission) {
+            return $this->isAllowed($source, $target, $permission);
+        }, $targets);
     }
 
     /**
