@@ -7,6 +7,8 @@ namespace SamIT\abac\connectors\yii2;
 use SamIT\abac\AuthorizableDummy;
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Rule;
+use yii\base\InvalidConfigException;
+use yii\web\IdentityInterface;
 
 class Manager extends \SamIT\abac\Manager implements \yii\rbac\CheckAccessInterface, \yii\base\Configurable
 {
@@ -16,7 +18,7 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\CheckAccessInterf
     public $debug = YII_DEBUG;
 
     /**
-     * @var string The ActiveRecord class for users.
+     * @var string Name of a class that implements IdentityInterface
      */
     protected $userClass;
 
@@ -90,6 +92,9 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\CheckAccessInterf
         if (!isset($this->userClass)) {
             throw new \yii\base\InvalidConfigException("userClass must be configured.");
         }
+        if (!is_subclass_of($this->userClass, IdentityInterface::class, true)) {
+            throw new InvalidConfigException("userClass must implement IdentityInterface");
+        }
     }
 
     /**
@@ -108,7 +113,6 @@ class Manager extends \SamIT\abac\Manager implements \yii\rbac\CheckAccessInterf
                 throw new \Exception("Failed to grant permission.");
             }
         } catch (\yii\db\Exception $e) {
-            throw $e;
             throw new \Exception("Failed to grant permission.", $e);
         }
     }
