@@ -15,6 +15,17 @@
         }
     },
     "require": {
-        "nikic/iter": "^1.5"
-    }
+        "nikic/iter": "^2"
+    },
+
+    "require-dev": {
+        "yiisoft/yii2": "dev-master"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ]
+
 }
