@@ -199,6 +199,10 @@ class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Au
         return $this->getTargetName()::findOne($this->getTargetId());
     }
 
+    /**
+     * @return PermissionQuery
+     * @throws \yii\base\InvalidConfigException
+     */
     public static function find()
     {
         return \Yii::createObject(PermissionQuery::className(), [get_called_class()]);
