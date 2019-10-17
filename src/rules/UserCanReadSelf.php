@@ -4,12 +4,14 @@
 namespace SamIT\abac\rules;
 
 
+use SamIT\abac\interfaces\AccessChecker;
 use SamIT\abac\interfaces\Authorizable;
+use SamIT\abac\interfaces\Environment;
 use SamIT\abac\Manager;
 use SamIT\abac\interfaces\Rule;
 
 
-abstract class UserCanReadSelf implements Rule
+class UserCanReadSelf implements Rule
 {
 
 
@@ -25,26 +27,33 @@ abstract class UserCanReadSelf implements Rule
     /**
      * @inheritdoc
      */
-    public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager, string $permission): bool
-    {
-        return ($source instanceof User)
-            && ($target instanceof User)
+    public function execute(
+        Authorizable $source,
+        Authorizable $target,
+        string $permission,
+        Environment $environment,
+        AccessChecker $accessChecker
+    ): bool {
+        return $source->getAuthName() === 'user'
+            && $source->getAuthName() === $target->getAuthName()
             && $source->getId() === $target->getId();
     }
 
-    /**
-     * @return string[] An array of class names that this rule applies to.
-     */
     public function getTargetNames(): array
     {
-        return [User::class];
+        return ['user'];
     }
 
-    /**
-     * @return string The name of the permission that this rule grants.
-     */
     public function getPermissions(): array
     {
         return [Manager::PERMISSION_READ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSourceNames(): array
+    {
+        return $this->getSourceNames();
     }
 }

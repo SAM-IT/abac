@@ -4,19 +4,11 @@
 namespace SamIT\abac\interfaces;
 
 
-interface Authorizable
+interface Authorizable extends AuthorizableType
 {
     /*
-     * Get the unique id for this object (unique with respect to objects with the same name).
+     * Get the unique identifier for this object (unique with respect to objects with the same name).
      * @return string
      */
     public function getId(): string;
-
-    /*
-     * Get the class name for authorization objects of this type.
-     * Mainly used to allow subclassing without changing the name.
-     * @return string
-     */
-    public function getAuthName(): string;
-
 }

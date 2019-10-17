@@ -3,13 +3,14 @@
 
 namespace SamIT\abac\rules;
 
+use SamIT\abac\interfaces\AccessChecker;
 use SamIT\abac\interfaces\Authorizable;
+use SamIT\abac\interfaces\Environment;
 use SamIT\abac\Manager;
 use SamIT\abac\interfaces\Rule;
 
 /**
  * Class WriteImpliesReadRule
- * @package prime\auth\rules
  * This rule allows a user to read something as long as they can write it.
  */
 class WriteImpliesReadRule implements Rule
@@ -30,10 +31,14 @@ class WriteImpliesReadRule implements Rule
      * @param \SamIT\abac\interfaces\Authorizable $target
      * @return boolean
      */
-    public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager, string $permission): bool
-    {
-        
-        return $manager->isAllowed($source, $target, Manager::PERMISSION_WRITE);
+    public function execute(
+        Authorizable $source,
+        Authorizable $target,
+        string $permission,
+        Environment $environment,
+        AccessChecker $accessChecker
+    ): bool {
+        return $accessChecker->check($source, $target, Manager::PERMISSION_WRITE);
     }
 
     /**
@@ -50,5 +55,13 @@ class WriteImpliesReadRule implements Rule
     public function getPermissions(): array
     {
         return [Manager::PERMISSION_READ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSourceNames(): array
+    {
+        return [];
     }
 }

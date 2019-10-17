@@ -15,11 +15,14 @@
         }
     },
     "require": {
+        "php": "> 7.3",
         "nikic/iter": "^2"
     },
 
     "require-dev": {
-        "yiisoft/yii2": "dev-master"
+        "ext-pcov": "*",
+        "yiisoft/yii2": "dev-master",
+        "phpunit/phpunit": "^8.4"
     },
     "repositories": [
         {

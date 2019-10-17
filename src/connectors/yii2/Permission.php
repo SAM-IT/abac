@@ -2,9 +2,6 @@
 
 namespace SamIT\abac\connectors\yii2;
 
-use prime\models\ActiveRecord;
-use prime\models\ar\Project;
-use prime\models\ar\User;
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Permission as PermissionInterface;
 use yii\db\ActiveRecordInterface;
@@ -19,11 +16,9 @@ use yii\validators\StringValidator;
  * @property string $target_name
  * @property string $target_id
  */
-class Permission extends \yii\db\ActiveRecord implements PermissionInterface, Authorizable
+class Permission extends \yii\db\ActiveRecord
 {
-    use ActiveRecordAuthorizableTrait;
-
-        // Cache for the results for the isAllowed loookup.
+    // Cache for the results for the isAllowed loookup.
     private static $cache = [];
 
     public function attributeLabels()

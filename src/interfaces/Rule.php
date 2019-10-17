@@ -7,29 +7,31 @@ namespace SamIT\abac\interfaces;
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\Manager;
 
-interface Rule
+/**
+ * Interface Rule
+ * Rules implementing this interface can be optimized by a RuleEngine; for example if the requested permission is not in
+ * the list returned by `getPermissions()` then the RuleEngine MAY skip this rule.
+ * The rule itself MUST always check that the source, target and permission are within expected ranges.
+ * @package SamIT\abac\interfaces
+ */
+interface Rule extends SimpleRule
 {
     /**
+     * The return value of this function should not change during the lifetime of an instance
      * @return string[] The names of the permission that this rule grants. If empty, this rule applies to all permissions.
      */
     public function getPermissions(): array;
 
     /**
-     * @return string[] An array of class names that this rule applies to. If empty, this rule applies to all target types.
+     * The return value of this function should not change during the lifetime of an instance
+     * @return string[] An array of source names that this rule applies to. If empty, this rule applies to all target types.
      */
     public function getTargetNames(): array;
+
+    /**
+     * The return value of this function should not change during the lifetime of an instance
+     * @return string[] An array of target names that this rule applies to. If empty, this rule applies to all target types.
+     */
+    public function getSourceNames(): array;
     
-    /**
-     * @return string A human readable description of what this rule does.
-     * Finish the sentence: "You can [permission] the [object] if.."
-     */
-    public function getDescription(): string;
-    /**
-     * @param Authorizable $source
-     * @param Authorizable $target
-     * @param \ArrayAccess $environment The environment
-     * @param Manager $manager The auth manager, use this for recursive lookups.
-     * @param string $permission The requested permission
-     */
-    public function execute(Authorizable $source, Authorizable $target, \ArrayAccess $environment, Manager $manager, string $permission): bool;
 }
