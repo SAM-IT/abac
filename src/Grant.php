@@ -6,6 +6,10 @@ namespace SamIT\abac;
 
 use SamIT\abac\interfaces\Authorizable;
 
+/**
+ * Simple value object
+ * @package SamIT\abac
+ */
 final class Grant implements \SamIT\abac\interfaces\Grant
 {
     private $source;

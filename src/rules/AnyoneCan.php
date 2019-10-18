@@ -10,32 +10,35 @@ use SamIT\abac\interfaces\Environment;
 use SamIT\abac\interfaces\SimpleRule;
 
 /**
- * Class UserCanReadSelf
- * @package SamIT\abac\rules
- * Allow anyone to do dummy operations on anything.
  */
-class AnyoneCanDummy implements SimpleRule
+class AnyoneCan implements SimpleRule
 {
-    /**
-     * @inheritdoc
-     */
-    public function getDescription(): string
+    private $permission;
+
+    public function __construct(string $permission)
     {
-        return "true";
+        $this->permission = $permission;
     }
 
     /**
-     * @param \SamIT\abac\interfaces\Authorizable $source
-     * @param \SamIT\abac\interfaces\Authorizable $target
+     * @inheritdoc
+     * @codeCoverageIgnore
+     */
+    public function getDescription(): string
+    {
+        return "[permission] equals {$this->permission}";
+    }
+
+    /**
      * @return boolean
      */
     public function execute(
-        Authorizable $source,
-        Authorizable $target,
+        object $source,
+        object $target,
         string $permission,
         Environment $environment,
         AccessChecker $accessChecker
     ): bool {
-        return $permission === 'dummy';
+        return $permission === $this->permission;
     }
 }

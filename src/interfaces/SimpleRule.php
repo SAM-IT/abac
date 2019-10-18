@@ -1,17 +1,12 @@
 <?php
-
+declare(strict_types=1);
 
 namespace SamIT\abac\interfaces;
-
-
-use SamIT\abac\interfaces\Authorizable;
-use SamIT\abac\Manager;
 
 /**
  * Interface SimpleRule
  * This interface is the minimum that must be implemented by a Rule Class.
  * Because of its simplicity little optimization is possible by the rule engine.
- * @package SamIT\abac\interfaces
  */
 interface SimpleRule
 {
@@ -22,16 +17,16 @@ interface SimpleRule
     public function getDescription(): string;
 
     /**
-     * @param Authorizable $source
-     * @param Authorizable $target
+     * @param object $source
+     * @param object $target
      * @param string $permission
      * @param Environment $environment
      * @param AccessChecker $accessChecker
      * @return bool
      */
     public function execute(
-        Authorizable $source,
-        Authorizable $target,
+        object $source,
+        object $target,
         string $permission,
         Environment $environment,
         AccessChecker $accessChecker

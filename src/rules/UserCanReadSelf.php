@@ -5,11 +5,8 @@ namespace SamIT\abac\rules;
 
 
 use SamIT\abac\interfaces\AccessChecker;
-use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Environment;
-use SamIT\abac\Manager;
 use SamIT\abac\interfaces\Rule;
-
 
 class UserCanReadSelf implements Rule
 {
@@ -18,6 +15,7 @@ class UserCanReadSelf implements Rule
 
     /**
      * @inheritdoc
+     * @codeCoverageIgnore
      */
     public function getDescription(): string
     {
@@ -28,8 +26,8 @@ class UserCanReadSelf implements Rule
      * @inheritdoc
      */
     public function execute(
-        Authorizable $source,
-        Authorizable $target,
+        object $source,
+        object $target,
         string $permission,
         Environment $environment,
         AccessChecker $accessChecker

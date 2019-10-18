@@ -1,11 +1,10 @@
 <?php
-
+declare(strict_types=1);
 
 namespace SamIT\abac;
 
 
 use SamIT\abac\interfaces\AccessChecker;
-use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Environment;
 use SamIT\abac\interfaces\PermissionRepository;
 use SamIT\abac\interfaces\Resolver;
@@ -35,6 +34,7 @@ class AuthManager implements AccessChecker
     private $environment;
 
     private $depth = 0;
+    private $partialResults = [];
 
     public function __construct(
         RuleEngine $ruleEngine,
@@ -48,28 +48,34 @@ class AuthManager implements AccessChecker
         $this->environment = $environment;
     }
 
-    /**
-     * @param object $source
-     * @param object $target
-     * @param string $permission
-     * @return bool
-     */
-    public function resolveAndCheck(
-        object $source,
-        object $target,
-        string $permission
-    ) {
-        $sourceAuthorizable = $this->resolver->fromSubject($source);
-        $targetAuthorizable = $this->resolver->fromSubject($target);
-        return $this->check($sourceAuthorizable, $targetAuthorizable, $permission);
+    private function storePartial(Grant $grant, bool $result)
+    {
+        if ($this->depth > 1) {
+
+            $source = $grant->getSource();
+            $target = $grant->getTarget();
+            $key = "{$source->getAuthName()}|{$source->getId()}|{$target->getAuthName()}|{$target->getId()}|{$grant->getPermission()}";
+            $this->partialResults[$key] = $result;
+        }
+    }
+
+    private function getPartial(Grant $grant): ?bool
+    {
+        if ($this->depth > 1) {
+            $source = $grant->getSource();
+            $target = $grant->getTarget();
+            $key = "{$source->getAuthName()}|{$source->getId()}|{$target->getAuthName()}|{$target->getId()}|{$grant->getPermission()}";
+            return $this->partialResults[$key] ?? null;
+        }
+        return null;
     }
 
     /**
      * @inheritDoc
      */
     public function check(
-        Authorizable $source,
-        Authorizable $target,
+        object $source,
+        object $target,
         string $permission
     ): bool {
         $this->depth++;
@@ -77,16 +83,30 @@ class AuthManager implements AccessChecker
             if ($this->depth > self::MAX_DEPTH) {
                 throw new \RuntimeException('Max nesting depth exceeded');
             }
-            return $this->permissionRepository->check(new Grant($source, $target, $permission))
-                || $this->ruleEngine->check(
+
+            $grant = new Grant(
+                $this->resolver->fromSubject($source),
+                $this->resolver->fromSubject($target),
+                $permission
+            );
+
+            if (null === $result = $this->getPartial($grant)) {
+                $result = $this->permissionRepository->check($grant) || $this->ruleEngine->check(
                     $source,
                     $target,
                     $permission,
                     $this->environment,
                     $this
                 );
+                $this->storePartial($grant, $result);
+            }
+            return $result;
         } finally {
             $this->depth--;
+            if ($this->depth === 0) {
+                $this->partialResults = [];
+            }
         }
     }
+
 }

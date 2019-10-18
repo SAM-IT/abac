@@ -22,8 +22,8 @@ interface RuleEngine
      * @return bool
      */
     public function check(
-        Authorizable $source,
-        Authorizable $target,
+        object $source,
+        object $target,
         string $permission,
         Environment $environment,
         AccessChecker $accessChecker

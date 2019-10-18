@@ -16,7 +16,7 @@ class EmptyRepository implements PermissionRepository
      */
     public function grant(Grant $grant): void
     {
-        return;
+        throw new \RuntimeException('Granting not supported');
     }
 
     /**

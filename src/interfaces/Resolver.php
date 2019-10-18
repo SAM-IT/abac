@@ -9,7 +9,7 @@ namespace SamIT\abac\interfaces;
 interface Resolver
 {
     /**
-     * @param object $object Any application entity
+     * @param object $object Any application entity, if it is already an Authorizable the object itself should be returned
      * @return Authorizable An authorizable for use in permission checking
      */
     public function fromSubject(object $object): ?Authorizable;

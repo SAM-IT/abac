@@ -6,24 +6,40 @@ namespace SamIT\abac\rules;
 use SamIT\abac\interfaces\AccessChecker;
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Environment;
-use SamIT\abac\Manager;
 use SamIT\abac\interfaces\Rule;
 
-/**
- * Class ReadImpliesListRule
- * This rule allows a user to list something as long as they can read it.
- */
-class ReadImpliesListRule implements Rule
-{
 
+/**
+ * This rule allows a user to do something as long as they can do something else.
+ */
+class ImpliedPermission implements Rule
+{
+    /**
+     * @var string
+     */
+    private $required;
+
+    /**
+     * @var array|true[string] Keys contain the permissions, values a constant
+     */
+    private $implied = [];
+
+    public function __construct(string $requiredPermission, array $impliedPermission)
+    {
+        $this->required = $requiredPermission;
+        foreach ($impliedPermission as $permission) {
+            $this->implied[$permission] = true;
+        }
+    }
 
     /**
      * @inheritdoc
      * "you can ... if [description]"
+     * @codeCoverageIgnore
      */
     public function getDescription(): string
     {
-        return "you can [read] it.";
+        return "you can [{$this->required}] it.";
     }
 
     /**
@@ -32,13 +48,14 @@ class ReadImpliesListRule implements Rule
      * @return boolean
      */
     public function execute(
-        Authorizable $source,
-        Authorizable $target,
+        object $source,
+        object  $target,
         string $permission,
         Environment $environment,
         AccessChecker $accessChecker
     ): bool {
-        return $accessChecker->check($source, $target, Manager::PERMISSION_READ);
+        return isset($this->implied[$permission])
+            && $accessChecker->check($source, $target, $this->required);
     }
 
     /**
@@ -49,12 +66,9 @@ class ReadImpliesListRule implements Rule
         return [];
     }
 
-    /**
-     * @return string The name of the permission that this rule grants.
-     */
     public function getPermissions(): array
     {
-        return [Manager::PERMISSION_LIST];
+        return array_keys($this->implied);
     }
 
     /**

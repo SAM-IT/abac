@@ -26,6 +26,7 @@ class AdminRole implements SimpleRule
 
     /**
      * @inheritdoc
+     * @codeCoverageIgnore
      */
     public function getDescription(): string
     {
@@ -36,8 +37,8 @@ class AdminRole implements SimpleRule
      * @inheritdoc
      */
     public function execute(
-        Authorizable $source,
-        Authorizable $target,
+        object $source,
+        object $target,
         string $permission,
         Environment $environment,
         AccessChecker $manager

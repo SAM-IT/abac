@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace SamIT\abac;
 
-
+/**
+ * Simple immutable Authorizable implementation
+ */
 final class Authorizable implements \SamIT\abac\interfaces\Authorizable
 {
     private $id;
@@ -23,6 +25,5 @@ final class Authorizable implements \SamIT\abac\interfaces\Authorizable
     public function getAuthName(): string
     {
         return $this->name;
-        // TODO: Implement getAuthName() method.
     }
 }
