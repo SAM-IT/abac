@@ -7,16 +7,21 @@ namespace test\rules;
 use SamIT\abac\interfaces\AccessChecker;
 use SamIT\abac\interfaces\Environment;
 use SamIT\abac\interfaces\SimpleRule;
-use SamIT\abac\rules\AnyoneCan;
+use SamIT\abac\rules\ImpliedPermission;
 use SamIT\abac\values\Authorizable;
 use test\interfaces\SimpleRuleTest;
 
-class AnyoneCanTest extends SimpleRuleTest
+/**
+ * Class ImpliedPermissionTest
+ * @package test\rules
+ * @covers \SamIT\abac\rules\ImpliedPermission
+ */
+class ImpliedPermissionTest extends SimpleRuleTest
 {
 
     protected function getRule(): SimpleRule
     {
-        return new AnyoneCan('test');
+        return new ImpliedPermission('a', ['b']);
     }
 
     public function checkProvider(): iterable
@@ -24,20 +29,26 @@ class AnyoneCanTest extends SimpleRuleTest
         $source = new Authorizable('id1', 'name');
         $admin = new Authorizable('1', 'admin');
         $target = new Authorizable('id2', 'name');
-        $permission = 'test';
         $environment = new class extends \ArrayObject implements Environment {};
         $accessChecker = new class implements AccessChecker {
             public function check(object $source, object $target, string $permission): bool
             {
+                if ($permission === 'a'
+                    && $source instanceof Authorizable
+                    && $source->getId() === '1'
+                ) {
+                    return true;
+                }
                 return false;
             }
         };
 
-        yield [$source, $target, $permission, $environment, $accessChecker, true];
-        yield [$admin, $target, $permission, $environment, $accessChecker, true];
-        yield [$source, $admin, $permission, $environment, $accessChecker, true];
         yield [$source, $target, 'a', $environment, $accessChecker, false];
+        // The rule does not allow 'a', the access checker does.
         yield [$admin, $target, 'a', $environment, $accessChecker, false];
+        // The rule does allow 'b', if the access checker allows a.
+        yield [$admin, $target, 'b', $environment, $accessChecker, true];
+        yield [$source, $admin, 'a', $environment, $accessChecker, false];
         yield [$source, $admin, 'a', $environment, $accessChecker, false];
     }
 }

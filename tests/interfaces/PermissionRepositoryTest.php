@@ -17,11 +17,11 @@ abstract class PermissionRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
 
-        $source = new \SamIT\abac\Authorizable('a', 'b');
-        $target = new \SamIT\abac\Authorizable( 'c', 'd');
+        $source = new \SamIT\abac\values\Authorizable('a', 'b');
+        $target = new \SamIT\abac\values\Authorizable( 'c', 'd');
         $permission = 'e';
 
-        $grant = new \SamIT\abac\Grant($source, $target, $permission);
+        $grant = new \SamIT\abac\values\Grant($source, $target, $permission);
 
         $this->assertFalse($repo->check($grant));
 
@@ -40,11 +40,11 @@ abstract class PermissionRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
 
-        $source = new \SamIT\abac\Authorizable('a', 'b');
-        $target = new \SamIT\abac\Authorizable( 'c', 'd');
+        $source = new \SamIT\abac\values\Authorizable('a', 'b');
+        $target = new \SamIT\abac\values\Authorizable( 'c', 'd');
         $permission = 'e';
 
-        $grant = new \SamIT\abac\Grant($source, $target, $permission);
+        $grant = new \SamIT\abac\values\Grant($source, $target, $permission);
 
         try {
             $repo->grant($grant);
@@ -65,11 +65,11 @@ abstract class PermissionRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
 
-        $source = new \SamIT\abac\Authorizable('a', 'b');
-        $target = new \SamIT\abac\Authorizable( 'c', 'd');
+        $source = new \SamIT\abac\values\Authorizable('a', 'b');
+        $target = new \SamIT\abac\values\Authorizable( 'c', 'd');
         $permission = 'e';
 
-        $grant = new \SamIT\abac\Grant($source, $target, $permission);
+        $grant = new \SamIT\abac\values\Grant($source, $target, $permission);
 
         $repo->revoke($grant);
         $this->assertFalse($repo->check($grant));
@@ -87,11 +87,11 @@ abstract class PermissionRepositoryTest extends TestCase
     {
         $repo = $this->getRepository();
 
-        $source = new \SamIT\abac\Authorizable('a', 'b');
-        $target = new \SamIT\abac\Authorizable( 'c', 'd');
+        $source = new \SamIT\abac\values\Authorizable('a', 'b');
+        $target = new \SamIT\abac\values\Authorizable( 'c', 'd');
         $permission = 'e';
 
-        $grant1 = new \SamIT\abac\Grant($source, $target, $permission);
+        $grant1 = new \SamIT\abac\values\Grant($source, $target, $permission);
 
         $repo->grant($grant1);
         $this->assertCount(1, toArray($repo->search(null, null, null)));

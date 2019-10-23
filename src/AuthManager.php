@@ -4,11 +4,15 @@ declare(strict_types=1);
 namespace SamIT\abac;
 
 
+use SamIT\abac\exceptions\NestingException;
+use SamIT\abac\exceptions\UnresolvableSourceException;
+use SamIT\abac\exceptions\UnresolvableTargetException;
 use SamIT\abac\interfaces\AccessChecker;
 use SamIT\abac\interfaces\Environment;
 use SamIT\abac\interfaces\PermissionRepository;
 use SamIT\abac\interfaces\Resolver;
 use SamIT\abac\interfaces\RuleEngine;
+use SamIT\abac\values\Grant;
 
 class AuthManager implements AccessChecker
 {
@@ -81,12 +85,21 @@ class AuthManager implements AccessChecker
         $this->depth++;
         try {
             if ($this->depth > self::MAX_DEPTH) {
-                throw new \RuntimeException('Max nesting depth exceeded');
+                throw new NestingException($this->depth);
             }
 
+            $sourceAuthorizable = $this->resolver->fromSubject($source);
+            if (!isset($sourceAuthorizable)) {
+                throw new UnresolvableSourceException($source);
+            }
+
+            $targetAuthorizable = $this->resolver->fromSubject($target);
+            if (!isset($targetAuthorizable)) {
+                throw new UnresolvableTargetException($target);
+            }
             $grant = new Grant(
-                $this->resolver->fromSubject($source),
-                $this->resolver->fromSubject($target),
+                $sourceAuthorizable,
+                $targetAuthorizable,
                 $permission
             );
 

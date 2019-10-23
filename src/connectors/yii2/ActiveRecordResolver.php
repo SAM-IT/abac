@@ -18,7 +18,7 @@ class ActiveRecordResolver implements Resolver
         if ($object instanceof ActiveRecord) {
             $id = implode('|', $object->getPrimaryKey(true));
             $name = get_class($object);
-            return new \SamIT\abac\Authorizable($id, $name);
+            return new \SamIT\abac\values\Authorizable($id, $name);
         } else {
             return null;
         }

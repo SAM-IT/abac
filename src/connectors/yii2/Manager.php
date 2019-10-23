@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace SamIT\abac\connectors\yii2;
 
-use SamIT\abac\AuthManager;
 use SamIT\abac\interfaces\AccessChecker;
-use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Resolver;
 use yii\base\InvalidConfigException;
 use yii\web\IdentityInterface;
@@ -103,7 +101,7 @@ class Manager  implements \yii\rbac\CheckAccessInterface, \yii\base\Configurable
         $source = $this->resolver->fromSubject($user);
 
         $target = $this->resolver->fromSubject($params[self::TARGET_PARAM])
-            ?? new \SamIT\abac\Authorizable($this->globalId, $this->globalName);
+            ?? new \SamIT\abac\values\Authorizable($this->globalId, $this->globalName);
 
 
         return $this->manager->resolveAndCheck($source, $target, $permissionName);

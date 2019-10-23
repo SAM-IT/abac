@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SamIT\abac;
+namespace SamIT\abac\values;
 
 /**
  * Simple immutable Authorizable implementation

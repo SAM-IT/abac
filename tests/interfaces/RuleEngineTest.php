@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace test;
 
 use PHPUnit\Framework\TestCase;
-use SamIT\abac\Authorizable;
 use SamIT\abac\interfaces\AccessChecker;
 use SamIT\abac\interfaces\Environment;
 use SamIT\abac\interfaces\RuleEngine;
 use SamIT\abac\interfaces\SimpleRule;
 use SamIT\abac\rules\ExecutionCountingRule;
 use SamIT\abac\rules\PermissionMatchRule;
+use SamIT\abac\values\Authorizable;
 
 abstract class RuleEngineTest extends TestCase
 {

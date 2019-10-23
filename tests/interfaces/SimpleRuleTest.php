@@ -29,7 +29,6 @@ abstract class SimpleRuleTest extends TestCase
         bool $result
     ) {
         $rule = $this->getRule();
-
         $this->assertSame($result, $rule->execute($source, $target, $permission, $environment, $accessChecker));
     }
 }

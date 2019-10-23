@@ -59,13 +59,18 @@ class ImpliedPermission implements Rule
     }
 
     /**
-     * @return string[] An array of class names that this rule applies to.
+     * @inheritDoc
+     * @codeCoverageIgnore
      */
     public function getTargetNames(): array
     {
         return [];
     }
 
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
     public function getPermissions(): array
     {
         return array_keys($this->implied);
@@ -73,6 +78,7 @@ class ImpliedPermission implements Rule
 
     /**
      * @inheritDoc
+     * @codeCoverageIgnore
      */
     public function getSourceNames(): array
     {

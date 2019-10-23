@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace test\rules;
 
 
-use SamIT\abac\Authorizable;
 use SamIT\abac\interfaces\AccessChecker;
 use SamIT\abac\interfaces\Environment;
 use SamIT\abac\interfaces\SimpleRule;
 use SamIT\abac\rules\AdminRole;
+use SamIT\abac\values\Authorizable;
 use test\interfaces\SimpleRuleTest;
 
 class AdminRoleTest extends SimpleRuleTest

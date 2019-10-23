@@ -143,9 +143,9 @@ class ActiveRecordRepository implements \SamIT\abac\interfaces\PermissionReposit
         $query->andFilterWhere([$this->attributeMap[self::PERMISSION] => $permission]);
 
         foreach($query->each() as $permission) {
-            $source = new \SamIT\abac\Authorizable($permission->source_id, $permission->source_name);
-            $target = new \SamIT\abac\Authorizable($permission->target_id, $permission->target_name);
-            yield new \SamIT\abac\Grant($source, $target, $permission->permission);
+            $source = new \SamIT\abac\values\Authorizable($permission->source_id, $permission->source_name);
+            $target = new \SamIT\abac\values\Authorizable($permission->target_id, $permission->target_name);
+            yield new \SamIT\abac\values\Grant($source, $target, $permission->permission);
         }
     }
 }

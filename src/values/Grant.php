@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SamIT\abac;
+namespace SamIT\abac\values;
 
 
 use SamIT\abac\interfaces\Authorizable;
@@ -12,8 +12,19 @@ use SamIT\abac\interfaces\Authorizable;
  */
 final class Grant implements \SamIT\abac\interfaces\Grant
 {
+    /**
+     * @var Authorizable
+     */
     private $source;
+
+    /**
+     * @var Authorizable
+     */
     private $target;
+
+    /**
+     * @var string
+     */
     private $permission;
 
     public function __construct(Authorizable $source, Authorizable $target, string $permission)
