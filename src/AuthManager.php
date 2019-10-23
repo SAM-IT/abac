@@ -97,11 +97,8 @@ class AuthManager implements AccessChecker
             if (!isset($targetAuthorizable)) {
                 throw new UnresolvableTargetException($target);
             }
-            $grant = new Grant(
-                $sourceAuthorizable,
-                $targetAuthorizable,
-                $permission
-            );
+
+            $grant = new Grant($sourceAuthorizable, $targetAuthorizable, $permission);
 
             if (null === $result = $this->getPartial($grant)) {
                 $result = $this->permissionRepository->check($grant) || $this->ruleEngine->check(
@@ -120,6 +117,40 @@ class AuthManager implements AccessChecker
                 $this->partialResults = [];
             }
         }
+    }
+
+    public function grant(object $source, object $target, string $permission)
+    {
+        $sourceAuthorizable = $this->resolver->fromSubject($source);
+        if (!isset($sourceAuthorizable)) {
+            throw new UnresolvableSourceException($source);
+        }
+
+        $targetAuthorizable = $this->resolver->fromSubject($target);
+        if (!isset($targetAuthorizable)) {
+            throw new UnresolvableTargetException($target);
+        }
+
+        $grant = new Grant($sourceAuthorizable, $targetAuthorizable, $permission);
+
+        $this->permissionRepository->grant($grant);
+    }
+
+    public function revoke(object $source, object $target, string $permission)
+    {
+        $sourceAuthorizable = $this->resolver->fromSubject($source);
+        if (!isset($sourceAuthorizable)) {
+            throw new UnresolvableSourceException($source);
+        }
+
+        $targetAuthorizable = $this->resolver->fromSubject($target);
+        if (!isset($targetAuthorizable)) {
+            throw new UnresolvableTargetException($target);
+        }
+
+        $grant = new Grant($sourceAuthorizable, $targetAuthorizable, $permission);
+
+        $this->permissionRepository->revoke($grant);
     }
 
     final public function getRepository(): PermissionRepository
