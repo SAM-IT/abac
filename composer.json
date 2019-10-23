@@ -28,7 +28,6 @@
     },
 
     "require-dev": {
-        "ext-pcov": "*",
         "yiisoft/yii2": "dev-master",
         "phpunit/phpunit": "^8.4"
     },

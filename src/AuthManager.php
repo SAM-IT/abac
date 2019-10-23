@@ -122,4 +122,11 @@ class AuthManager implements AccessChecker
         }
     }
 
+    final public function getRepository(): PermissionRepository
+    {
+        return $this->permissionRepository;
+    }
+
+
+
 }
