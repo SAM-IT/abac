@@ -12,6 +12,7 @@ use SamIT\abac\interfaces\Environment;
 use SamIT\abac\interfaces\PermissionRepository;
 use SamIT\abac\interfaces\Resolver;
 use SamIT\abac\interfaces\RuleEngine;
+use SamIT\abac\values\Authorizable;
 use SamIT\abac\values\Grant;
 
 class AuthManager implements AccessChecker
@@ -156,6 +157,11 @@ class AuthManager implements AccessChecker
     final public function getRepository(): PermissionRepository
     {
         return $this->permissionRepository;
+    }
+
+    final public function resolveSubject(object $subject): ?Authorizable
+    {
+        return $this->resolver->fromSubject($subject);
     }
 
 
