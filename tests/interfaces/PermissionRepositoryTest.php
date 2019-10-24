@@ -29,6 +29,8 @@ abstract class PermissionRepositoryTest extends TestCase
             // Either grant succeeds and check must return TRUE
             $repo->grant($grant);
             $this->assertTrue($repo->check($grant));
+
+            $this->assertTrue($repo->check(clone $grant));
         } catch (\RuntimeException $e) {
             // Or grant fails, an exception is thrown and check must return false
             $this->assertFalse($repo->check($grant));

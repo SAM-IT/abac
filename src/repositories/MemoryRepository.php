@@ -15,13 +15,24 @@ class MemoryRepository implements PermissionRepository
      */
     private $grants = [];
 
+
+    private function hashGrant(Grant $grant): string
+    {
+        return implode('.', [
+            $grant->getPermission(),
+            $grant->getSource()->getAuthName(),
+            $grant->getSource()->getId(),
+            $grant->getTarget()->getAuthName(),
+            $grant->getTarget()->getId()
+        ]);
+    }
+
     /**
      * @inheritDoc
      */
     public function grant(Grant $grant): void
     {
-        // Note that this stores a strong reference, when PHP 7.4 hits it makes sense to use a weak reference instead.
-        $this->grants[spl_object_hash($grant)] = $grant;
+        $this->grants[$this->hashGrant($grant)] = $grant;
     }
 
     /**
@@ -29,7 +40,7 @@ class MemoryRepository implements PermissionRepository
      */
     public function revoke(Grant $grant): void
     {
-        unset($this->grants[spl_object_hash($grant)]);
+        unset($this->grants[$this->hashGrant($grant)]);
     }
 
     /**
@@ -37,7 +48,7 @@ class MemoryRepository implements PermissionRepository
      */
     public function check(Grant $grant): bool
     {
-        return isset($this->grants[spl_object_hash($grant)]);
+        return isset($this->grants[$this->hashGrant($grant)]);
     }
 
     /**
