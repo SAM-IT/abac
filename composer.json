@@ -28,8 +28,7 @@
     },
 
     "require-dev": {
-        "yiisoft/yii2": "dev-master",
-        "phpunit/phpunit": "^8.4"
+        "phpunit/phpunit": "> 8"
     },
     "repositories": [
         {

@@ -31,6 +31,7 @@ class ChainedResolver implements Resolver
                 return $authorizable;
             }
         }
+        return null;
     }
 
     /**
@@ -43,5 +44,6 @@ class ChainedResolver implements Resolver
                 return $subject;
             }
         }
+        return null;
     }
 }
