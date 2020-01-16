@@ -89,29 +89,34 @@ class AuthManager implements AccessChecker
                 throw new NestingException($this->depth);
             }
 
+
             $sourceAuthorizable = $this->resolver->fromSubject($source);
-            if (!isset($sourceAuthorizable)) {
-                throw new UnresolvableSourceException($source);
-            }
-
             $targetAuthorizable = $this->resolver->fromSubject($target);
-            if (!isset($targetAuthorizable)) {
-                throw new UnresolvableTargetException($target);
-            }
-
-            $grant = new Grant($sourceAuthorizable, $targetAuthorizable, $permission);
-
-            if (null === $result = $this->getPartial($grant)) {
-                $result = $this->permissionRepository->check($grant) || $this->ruleEngine->check(
+            if (isset($sourceAuthorizable, $targetAuthorizable)) {
+                $grant = new Grant($sourceAuthorizable, $targetAuthorizable, $permission);
+                if (null === $result = $this->getPartial($grant)) {
+                    $result = $this->permissionRepository->check($grant) || $this->ruleEngine->check(
+                            $source,
+                            $target,
+                            $permission,
+                            $this->environment,
+                            $this
+                        );
+                    $this->storePartial($grant, $result);
+                }
+            } else {
+                // If either source or target is not resolvable, we can still use the rule engine.
+                $result = $this->ruleEngine->check(
                     $source,
                     $target,
                     $permission,
                     $this->environment,
                     $this
                 );
-                $this->storePartial($grant, $result);
             }
+
             return $result;
+
         } finally {
             $this->depth--;
             if ($this->depth === 0) {

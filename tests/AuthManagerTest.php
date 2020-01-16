@@ -182,8 +182,7 @@ final class AuthManagerTest extends TestCase
 
         $manager = new AuthManager($engine, $repo, $resolver, $env);
 
-        $this->expectException(\RuntimeException::class);
-        $manager->check(new \stdClass(), $repo, 'doSomethingCool');
+        $this->assertFalse($manager->check(new \stdClass(), $repo, 'doSomethingCool'));
     }
 
     public function testCheckUnresolvableTargetException()
@@ -207,7 +206,6 @@ final class AuthManagerTest extends TestCase
 
         $manager = new AuthManager($engine, $repo, $resolver, $env);
 
-        $this->expectException(\RuntimeException::class);
-        $manager->check(new \SamIT\abac\values\Authorizable('13', 'test'), new \stdClass(), 'doSomethingCool');
+        $this->assertFalse($manager->check(new \SamIT\abac\values\Authorizable('13', 'test'), new \stdClass(), 'doSomethingCool'));
     }
 }
