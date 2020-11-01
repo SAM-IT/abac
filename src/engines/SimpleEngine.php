@@ -3,7 +3,6 @@
 
 namespace SamIT\abac\engines;
 
-
 use SamIT\abac\interfaces\AccessChecker;
 use SamIT\abac\interfaces\Environment;
 use SamIT\abac\interfaces\RuleEngine;
@@ -20,7 +19,7 @@ class SimpleEngine implements RuleEngine
      */
     public function __construct(iterable $rules)
     {
-        foreach($rules as $rule) {
+        foreach ($rules as $rule) {
             if (!$rule instanceof SimpleRule) {
                 throw new \InvalidArgumentException('Rules must implement SimpleRule');
             }
@@ -38,7 +37,7 @@ class SimpleEngine implements RuleEngine
         Environment $environment,
         AccessChecker $recursiveLookup
     ): bool {
-        foreach($this->rules as $rule) {
+        foreach ($this->rules as $rule) {
             if ($rule->execute($source, $target, $permission, $environment, $recursiveLookup)) {
                 return true;
             }

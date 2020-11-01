@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace test\resolvers;
 
-
 use PHPUnit\Framework\TestCase;
 use SamIT\abac\interfaces\Resolver;
 use SamIT\abac\resolvers\ChainedResolver;

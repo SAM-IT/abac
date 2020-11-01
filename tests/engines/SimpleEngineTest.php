@@ -20,6 +20,4 @@ class SimpleEngineTest extends RuleEngineTest
     {
         return new SimpleEngine($rules);
     }
-
-
 }

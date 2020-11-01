@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace SamIT\abac;
 
-
 use SamIT\abac\exceptions\NestingException;
 use SamIT\abac\exceptions\UnresolvableSourceException;
 use SamIT\abac\exceptions\UnresolvableTargetException;
@@ -56,7 +55,6 @@ class AuthManager implements AccessChecker
     private function storePartial(Grant $grant, bool $result)
     {
         if ($this->depth > 1) {
-
             $source = $grant->getSource();
             $target = $grant->getTarget();
             $key = "{$source->getAuthName()}|{$source->getId()}|{$target->getAuthName()}|{$target->getId()}|{$grant->getPermission()}";
@@ -96,12 +94,12 @@ class AuthManager implements AccessChecker
                 $grant = new Grant($sourceAuthorizable, $targetAuthorizable, $permission);
                 if (null === $result = $this->getPartial($grant)) {
                     $result = $this->permissionRepository->check($grant) || $this->ruleEngine->check(
-                            $source,
-                            $target,
-                            $permission,
-                            $this->environment,
-                            $this
-                        );
+                        $source,
+                        $target,
+                        $permission,
+                        $this->environment,
+                        $this
+                    );
                     $this->storePartial($grant, $result);
                 }
             } else {
@@ -116,7 +114,6 @@ class AuthManager implements AccessChecker
             }
 
             return $result;
-
         } finally {
             $this->depth--;
             if ($this->depth === 0) {
@@ -168,7 +165,4 @@ class AuthManager implements AccessChecker
     {
         return $this->resolver->fromSubject($subject);
     }
-
-
-
 }

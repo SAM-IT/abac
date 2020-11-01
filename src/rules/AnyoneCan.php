@@ -3,7 +3,6 @@
 
 namespace SamIT\abac\rules;
 
-
 use SamIT\abac\interfaces\AccessChecker;
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Environment;

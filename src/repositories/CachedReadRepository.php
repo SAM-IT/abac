@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SamIT\abac\repositories;
 
-
 use SamIT\abac\helpers\Cache;
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Grant;
@@ -66,7 +65,7 @@ class CachedReadRepository implements PermissionRepository
      */
     public function search(?Authorizable $source, ?Authorizable $target, ?string $permission): iterable
     {
-        foreach($this->permissionRepository->search($source, $target, $permission) as $key => $grant) {
+        foreach ($this->permissionRepository->search($source, $target, $permission) as $key => $grant) {
             $this->cache->set($grant, true);
             yield $key => $grant;
         }

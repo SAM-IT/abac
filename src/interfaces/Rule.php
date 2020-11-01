@@ -3,7 +3,6 @@
 
 namespace SamIT\abac\interfaces;
 
-
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\Manager;
 
@@ -33,5 +32,4 @@ interface Rule extends SimpleRule
      * @return string[] An array of target names that this rule applies to. If empty, this rule applies to all target types.
      */
     public function getSourceNames(): array;
-    
 }

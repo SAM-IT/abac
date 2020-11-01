@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace SamIT\abac\repositories;
 
-
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Grant;
 use SamIT\abac\interfaces\PermissionRepository;

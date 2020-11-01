@@ -3,7 +3,6 @@
 
 namespace SamIT\abac\rules;
 
-
 use SamIT\abac\interfaces\AccessChecker;
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Environment;
@@ -19,7 +18,7 @@ class AdminRole implements SimpleRule
      */
     public function __construct(array $admins)
     {
-        foreach($admins as $admin) {
+        foreach ($admins as $admin) {
             $this->admins["{$admin->getAuthName()}|{$admin->getId()}"] = true;
         }
     }
@@ -42,8 +41,7 @@ class AdminRole implements SimpleRule
         string $permission,
         Environment $environment,
         AccessChecker $manager
-    ): bool
-    {
+    ): bool {
         return isset($this->admins["{$source->getAuthName()}|{$source->getId()}"]);
     }
 }

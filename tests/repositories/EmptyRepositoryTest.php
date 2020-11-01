@@ -29,6 +29,4 @@ class EmptyRepositoryTest extends PermissionRepositoryTest
         $this->expectException(\RuntimeException::class);
         parent::testGrant();
     }
-
-
 }

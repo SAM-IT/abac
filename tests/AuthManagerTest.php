@@ -55,12 +55,14 @@ final class AuthManagerTest extends TestCase
             }
         };
 
-        $env = new class extends \ArrayObject implements Environment {};
+        $env = new class extends \ArrayObject implements Environment {
+        };
 
         $manager = new AuthManager($ruleEngine, $repo, $resolver, $env);
         $this->expectException(NestingException::class);
         $source = $target = new class implements Authorizable {
-            public function getId(): string {
+            public function getId(): string
+            {
                 return '';
             }
 
@@ -80,7 +82,10 @@ final class AuthManagerTest extends TestCase
     {
         $rule = new class implements SimpleRule {
             public $counter = 0;
-            public function getDescription(): string { return ''; }
+            public function getDescription(): string
+            {
+                return '';
+            }
             public function execute(
                 object $source,
                 object $target,
@@ -94,14 +99,16 @@ final class AuthManagerTest extends TestCase
                 } else {
                     return false;
                 }
-
             }
         };
 
         $engine = new SimpleEngine([
             $rule,
             new class implements SimpleRule {
-                public function getDescription(): string { return ''; }
+                public function getDescription(): string
+                {
+                    return '';
+                }
                 public function execute(
                     object $source,
                     object $target,
@@ -115,7 +122,10 @@ final class AuthManagerTest extends TestCase
                 }
             },
             new class implements SimpleRule {
-                public function getDescription(): string { return ''; }
+                public function getDescription(): string
+                {
+                    return '';
+                }
                 public function execute(
                     object $source,
                     object $target,
@@ -144,11 +154,13 @@ final class AuthManagerTest extends TestCase
             }
         };
 
-        $env = new class extends \ArrayObject implements Environment {};
+        $env = new class extends \ArrayObject implements Environment {
+        };
 
         $manager = new AuthManager($engine, $repo, $resolver, $env);
         $source = $target = new class implements Authorizable {
-            public function getId(): string {
+            public function getId(): string
+            {
                 return '';
             }
 
@@ -179,7 +191,8 @@ final class AuthManagerTest extends TestCase
             }
         };
 
-        $env = new class extends \ArrayObject implements Environment {};
+        $env = new class extends \ArrayObject implements Environment {
+        };
 
         $manager = new AuthManager($engine, $repo, $resolver, $env);
 
@@ -203,7 +216,8 @@ final class AuthManagerTest extends TestCase
             }
         };
 
-        $env = new class extends \ArrayObject implements Environment {};
+        $env = new class extends \ArrayObject implements Environment {
+        };
 
         $manager = new AuthManager($engine, $repo, $resolver, $env);
 
@@ -213,7 +227,8 @@ final class AuthManagerTest extends TestCase
     public function testGetRepository(): void
     {
         $repo = new EmptyRepository();
-        $env = new class extends \ArrayObject implements Environment {};
+        $env = new class extends \ArrayObject implements Environment {
+        };
         $manager = new AuthManager(new SimpleEngine([]), $repo, new AuthorizableResolver(), $env);
 
         $this->assertSame($repo, $manager->getRepository());

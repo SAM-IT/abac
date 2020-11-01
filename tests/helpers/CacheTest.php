@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace test\helpers;
 
-
 use PHPUnit\Framework\TestCase;
 use SamIT\abac\helpers\Cache;
 use SamIT\abac\values\Authorizable;
@@ -26,8 +25,5 @@ class CacheTest extends TestCase
         $subject->set($grant, true);
 
         $this->assertTrue($subject->check($grant));
-
-
     }
-
 }

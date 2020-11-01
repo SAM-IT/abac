@@ -3,7 +3,6 @@
 
 namespace SamIT\abac\interfaces;
 
-
 interface AuthorizableType
 {
     /*

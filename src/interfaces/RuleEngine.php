@@ -28,5 +28,4 @@ interface RuleEngine
         Environment $environment,
         AccessChecker $accessChecker
     ): bool;
-
 }

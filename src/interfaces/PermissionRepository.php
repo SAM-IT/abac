@@ -3,7 +3,6 @@
 
 namespace SamIT\abac\interfaces;
 
-
 interface PermissionRepository
 {
     /**
@@ -35,5 +34,4 @@ interface PermissionRepository
      * @return Grant[]
      */
     public function search(?Authorizable $source, ?Authorizable $target, ?string $permission): iterable;
-
 }

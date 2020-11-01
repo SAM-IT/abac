@@ -14,5 +14,4 @@ class AuthorizableTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('0001', $a->getId());
         $this->assertSame('abc', $a->getAuthName());
     }
-
 }

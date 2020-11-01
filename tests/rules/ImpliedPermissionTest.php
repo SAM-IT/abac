@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace test\rules;
 
-
 use SamIT\abac\interfaces\AccessChecker;
 use SamIT\abac\interfaces\Environment;
 use SamIT\abac\interfaces\SimpleRule;
@@ -29,7 +28,8 @@ class ImpliedPermissionTest extends SimpleRuleTest
         $source = new Authorizable('id1', 'name');
         $admin = new Authorizable('1', 'admin');
         $target = new Authorizable('id2', 'name');
-        $environment = new class extends \ArrayObject implements Environment {};
+        $environment = new class extends \ArrayObject implements Environment {
+        };
         $accessChecker = new class implements AccessChecker {
             public function check(object $source, object $target, string $permission): bool
             {

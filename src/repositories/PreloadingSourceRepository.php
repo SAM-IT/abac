@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace SamIT\abac\repositories;
 
-
 use SamIT\abac\helpers\Cache;
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Grant;
@@ -62,8 +61,7 @@ class PreloadingSourceRepository implements PermissionRepository
     public function preloadSource(Authorizable $source): void
     {
         $this->loadedSources[$this->serializeAuthorizable($source)] = true;
-        foreach($this->permissionRepository->search($source, null, null) as $grant)
-        {
+        foreach ($this->permissionRepository->search($source, null, null) as $grant) {
             $this->cache->set($grant, true);
         }
     }

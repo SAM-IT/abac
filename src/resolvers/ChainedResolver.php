@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace SamIT\abac\resolvers;
 
-
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Resolver;
 
@@ -26,7 +25,7 @@ class ChainedResolver implements Resolver
      */
     public function fromSubject(object $object): ?Authorizable
     {
-        foreach($this->resolvers as $resolver) {
+        foreach ($this->resolvers as $resolver) {
             if (null !== $authorizable = $resolver->fromSubject($object)) {
                 return $authorizable;
             }
@@ -39,7 +38,7 @@ class ChainedResolver implements Resolver
      */
     public function toSubject(Authorizable $authorizable): ?object
     {
-        foreach($this->resolvers as $resolver) {
+        foreach ($this->resolvers as $resolver) {
             if (null !== $subject = $resolver->toSubject($authorizable)) {
                 return $subject;
             }

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace test\interfaces;
 
-
 use PHPUnit\Framework\TestCase;
 use SamIT\abac\interfaces\AccessChecker;
 use SamIT\abac\interfaces\Authorizable;

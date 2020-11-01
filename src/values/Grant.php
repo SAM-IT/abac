@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace SamIT\abac\values;
 
-
 use SamIT\abac\interfaces\Authorizable;
 
 /**

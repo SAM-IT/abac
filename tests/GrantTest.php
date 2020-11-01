@@ -12,14 +12,12 @@ class GrantTest extends \PHPUnit\Framework\TestCase
     public function testGetters()
     {
         $source = new \SamIT\abac\values\Authorizable('a', 'b');
-        $target = new \SamIT\abac\values\Authorizable( 'c', 'd');
+        $target = new \SamIT\abac\values\Authorizable('c', 'd');
         $permission = 'e';
 
         $grant = new \SamIT\abac\values\Grant($source, $target, $permission);
         $this->assertSame($source, $grant->getSource());
         $this->assertSame($target, $grant->getTarget());
         $this->assertSame($permission, $grant->getPermission());
-
     }
-
 }

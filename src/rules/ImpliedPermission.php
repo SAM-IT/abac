@@ -8,7 +8,6 @@ use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Environment;
 use SamIT\abac\interfaces\Rule;
 
-
 /**
  * This rule allows a user to do something as long as they can do something else.
  */

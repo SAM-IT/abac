@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace SamIT\abac\helpers;
 
-
 use SamIT\abac\interfaces\Grant;
 
 /**
@@ -33,6 +32,5 @@ class Cache
         $source = $grant->getSource();
         $target = $grant->getTarget();
         return "{$source->getAuthName()}|{$source->getId()}|{$target->getAuthName()}|{$target->getId()}|{$grant->getPermission()}";
-
     }
 }

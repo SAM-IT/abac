@@ -26,7 +26,8 @@ abstract class RuleEngineTest extends TestCase
     {
         $source = new Authorizable('id1', 'name');
         $target = new Authorizable('id2', 'name');
-        $environment = new class extends \ArrayObject implements Environment {};
+        $environment = new class extends \ArrayObject implements Environment {
+        };
         $accessChecker = new class implements AccessChecker {
             public function check(object $source, object $target, string $permission): bool
             {

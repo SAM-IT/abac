@@ -24,7 +24,7 @@ class PreloadingSourceRepositoryTest extends PermissionRepositoryTest
         $subject = new PreloadingSourceRepository($base);
 
         $source = new \SamIT\abac\values\Authorizable('a', 'b');
-        $target = new \SamIT\abac\values\Authorizable( 'c', 'd');
+        $target = new \SamIT\abac\values\Authorizable('c', 'd');
         $permission = 'e';
 
         $grant = new \SamIT\abac\values\Grant($source, $target, $permission);
@@ -36,6 +36,5 @@ class PreloadingSourceRepositoryTest extends PermissionRepositoryTest
         $subject->preloadSource($source);
         $base->revoke($grant);
         $this->assertTrue($subject->check($grant));
-
     }
 }

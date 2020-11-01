@@ -18,7 +18,7 @@ abstract class PermissionRepositoryTest extends TestCase
         $repo = $this->getRepository();
 
         $source = new \SamIT\abac\values\Authorizable('a', 'b');
-        $target = new \SamIT\abac\values\Authorizable( 'c', 'd');
+        $target = new \SamIT\abac\values\Authorizable('c', 'd');
         $permission = 'e';
 
         $grant = new \SamIT\abac\values\Grant($source, $target, $permission);
@@ -38,7 +38,7 @@ abstract class PermissionRepositoryTest extends TestCase
         $repo = $this->getRepository();
 
         $source = new \SamIT\abac\values\Authorizable('a', 'b');
-        $target = new \SamIT\abac\values\Authorizable( 'c', 'd');
+        $target = new \SamIT\abac\values\Authorizable('c', 'd');
         $permission = 'e';
 
         $grant = new \SamIT\abac\values\Grant($source, $target, $permission);
@@ -61,7 +61,7 @@ abstract class PermissionRepositoryTest extends TestCase
         $repo = $this->getRepository();
 
         $source = new \SamIT\abac\values\Authorizable('a', 'b');
-        $target = new \SamIT\abac\values\Authorizable( 'c', 'd');
+        $target = new \SamIT\abac\values\Authorizable('c', 'd');
         $permission = 'e';
 
         $grant1 = new \SamIT\abac\values\Grant($source, $target, $permission);
@@ -84,7 +84,7 @@ abstract class PermissionRepositoryTest extends TestCase
         $repo = $this->getRepository();
 
         $source = new \SamIT\abac\values\Authorizable('a', 'b');
-        $target = new \SamIT\abac\values\Authorizable( 'c', 'd');
+        $target = new \SamIT\abac\values\Authorizable('c', 'd');
         $permission = 'e';
 
         $grant = new \SamIT\abac\values\Grant($source, $target, $permission);
