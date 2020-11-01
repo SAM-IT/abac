@@ -8,7 +8,7 @@ Rules implement business logic, the input for rule execution consists of:
 - permission: The action the actor wishes to take
 - environment: The environment should contain anything else the business rules may need
 
-Rules are encourage to do recursive access check. A typical rule could be `WriteImpliesRead`, since for most systems when you can write an object you can also read it.
+Rules are encouraged to do recursive access check. A typical rule could be `WriteImpliesRead`, since for most systems when you can write an object you can also read it.
 Implementation could look like this:
 ```php
 public function execute(
