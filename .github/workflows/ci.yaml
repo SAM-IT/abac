@@ -41,7 +41,7 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist
       - name: Run tests
-        run: composer test -- --coverage-xml coverage.xml
+        run: composer test -- --coverage-clover coverage.xml
       - name: Get Ocular
         run: wget https://scrutinizer-ci.com/ocular.phar
       - name: Push code coverage
