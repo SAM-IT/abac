@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace test;
+namespace test\repositories;
 
 /**
  * @covers \SamIT\abac\repositories\CachedReadRepository

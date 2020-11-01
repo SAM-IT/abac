@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace test;
+namespace test\repositories;
 
 use SamIT\abac\interfaces\PermissionRepository;
 use SamIT\abac\repositories\MemoryRepository;

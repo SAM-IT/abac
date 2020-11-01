@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SamIT\abac\repositories;
 
 
+use SamIT\abac\helpers\Cache;
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Grant;
 use SamIT\abac\interfaces\PermissionRepository;
@@ -19,11 +20,14 @@ class CachedReadRepository implements PermissionRepository
     /**
      * @var PermissionRepository
      */
-    private $permissionRepository;
+    private PermissionRepository $permissionRepository;
+
+    private Cache $cache;
 
     public function __construct(PermissionRepository $permissionRepository)
     {
         $this->permissionRepository = $permissionRepository;
+        $this->cache = new Cache();
     }
 
     /**
@@ -32,7 +36,7 @@ class CachedReadRepository implements PermissionRepository
     public function grant(Grant $grant): void
     {
         $this->permissionRepository->grant($grant);
-        $this->addToCache($grant, true);
+        $this->cache->set($grant, true);
     }
 
 
@@ -42,37 +46,17 @@ class CachedReadRepository implements PermissionRepository
     public function revoke(Grant $grant): void
     {
         $this->permissionRepository->revoke($grant);
-        $this->addToCache($grant, false);
+        $this->cache->set($grant, false);
     }
 
-    private $cache = [];
-
-    private function serializeGrant(Grant $grant): string
-    {
-        $source = $grant->getSource();
-        $target = $grant->getTarget();
-        return "{$source->getAuthName()}|{$source->getId()}|{$target->getAuthName()}|{$target->getId()}|{$grant->getPermission()}";
-
-    }
-
-    private function addToCache(Grant $grant, bool $allowed): void
-    {
-        $this->cache[$this->serializeGrant($grant)] = $allowed;
-    }
-
-    private function checkFromCache(Grant $grant): ?bool
-    {
-        return $this->cache[$this->serializeGrant($grant)] ?? null;
-    }
 
     /**
      * @inheritDoc
      */
     public function check(Grant $grant): bool
     {
-        if (null === $result = $this->checkFromCache($grant)) {
-            $this->addToCache($grant, $result = $this->permissionRepository->check($grant));
-
+        if (null === $result = $this->cache->check($grant)) {
+            $this->cache->set($grant, $result = $this->permissionRepository->check($grant));
         }
         return $result;
     }
@@ -83,7 +67,7 @@ class CachedReadRepository implements PermissionRepository
     public function search(?Authorizable $source, ?Authorizable $target, ?string $permission): iterable
     {
         foreach($this->permissionRepository->search($source, $target, $permission) as $key => $grant) {
-            $this->addToCache($grant, true);
+            $this->cache->set($grant, true);
             yield $key => $grant;
         }
     }

@@ -14,6 +14,7 @@ use SamIT\abac\interfaces\Resolver;
 use SamIT\abac\interfaces\RuleEngine;
 use SamIT\abac\interfaces\SimpleRule;
 use SamIT\abac\repositories\EmptyRepository;
+use SamIT\abac\resolvers\AuthorizableResolver;
 
 /**
  * Class AuthManagerTest
@@ -207,5 +208,15 @@ final class AuthManagerTest extends TestCase
         $manager = new AuthManager($engine, $repo, $resolver, $env);
 
         $this->assertFalse($manager->check(new \SamIT\abac\values\Authorizable('13', 'test'), new \stdClass(), 'doSomethingCool'));
+    }
+
+    public function testGetRepository(): void
+    {
+        $repo = new EmptyRepository();
+        $env = new class extends \ArrayObject implements Environment {};
+        $manager = new AuthManager(new SimpleEngine([]), $repo, new AuthorizableResolver(), $env);
+
+        $this->assertSame($repo, $manager->getRepository());
+        $this->assertNotSame(clone $repo, $manager->getRepository());
     }
 }
