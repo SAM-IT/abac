@@ -41,11 +41,11 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist
       - name: Run tests
-        run: composer test -- --coverage-xml
+        run: composer test -- --coverage-xml coverage.xml
       - name: Get Ocular
         run: wget https://scrutinizer-ci.com/ocular.phar
       - name: Push code coverage
-        run: php ocular.phar code-coverage:upload --format=php-clover tests/_output/coverage.xml
+        run: php ocular.phar code-coverage:upload --format=php-clover coverage.xml
   release:
     name: Automated release
     needs: [test, cs]
