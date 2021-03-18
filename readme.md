@@ -28,3 +28,8 @@ Reasoning behind this is that having 1 location for the environment allows for e
 
 # Infinite loops
 Rules can contain infinite loops, we track recursion depth to detect these loops.
+
+# External links 
+
+ - [What Is Attribute-Based Access Control (ABAC)? - by Keith Casey](https://www.okta.com/blog/2020/09/attribute-based-access-control-abac/)
+ - [Attribute-based access control on Wikipedia](https://en.wikipedia.org/wiki/Attribute-based_access_control)
