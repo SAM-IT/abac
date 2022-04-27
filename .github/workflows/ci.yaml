@@ -10,12 +10,14 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.1'
-          tools: symplify/easy-coding-standard, phpstan, phpunit, phpDocumentor
+          tools: symplify/easy-coding-standard, phpstan, psalm, phpunit, phpDocumentor
       - name: Test code style
         run: ecs
       - name: Install dependencies
         run: composer install --no-dev
-      - name: Static analysis
+      - name: Static analysis (psalm)
+        run: psalm
+      - name: Static analysis (phpstan)
         run: phpstan analyse src
       - name: Install dependencies including dev
         run: composer install
