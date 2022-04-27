@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -29,33 +30,23 @@ class CachedReadRepository implements PermissionRepository
         $this->cache = new Cache();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function grant(Grant $grant): void
     {
         $this->permissionRepository->grant($grant);
         $this->cache->set($grant, true);
     }
 
-
-    /**
-     * @inheritDoc
-     */
     public function revoke(Grant $grant): void
     {
         $this->permissionRepository->revoke($grant);
         $this->cache->set($grant, false);
     }
 
-
-    /**
-     * @inheritDoc
-     */
     public function check(Grant $grant): bool
     {
         if (null === $result = $this->cache->check($grant)) {
-            $this->cache->set($grant, $result = $this->permissionRepository->check($grant));
+            $result = $this->permissionRepository->check($grant);
+            $this->cache->set($grant, $result);
         }
         return $result;
     }
@@ -65,9 +56,9 @@ class CachedReadRepository implements PermissionRepository
      */
     public function search(?Authorizable $source, ?Authorizable $target, ?string $permission): iterable
     {
-        foreach ($this->permissionRepository->search($source, $target, $permission) as $key => $grant) {
+        foreach ($this->permissionRepository->search($source, $target, $permission) as $grant) {
             $this->cache->set($grant, true);
-            yield $key => $grant;
+            yield $grant;
         }
     }
 }

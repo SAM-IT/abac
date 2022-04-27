@@ -1,47 +1,52 @@
 <?php
 
+declare(strict_types=1);
 
 namespace SamIT\abac\rules;
 
+use Closure;
 use SamIT\abac\interfaces\AccessChecker;
-use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Environment;
 use SamIT\abac\interfaces\SimpleRule;
+use function PHPStan\dumpType;
 
-class AdminRole implements SimpleRule
+final class AdminRole implements SimpleRule
 {
-    private $admins = [];
+    /**
+     * @var array<string, true>
+     */
+    private array $admins = [];
 
     /**
-     * AdminRole constructor.
-     * @param Authorizable[] $admins
+     * @var Closure(object): string
      */
-    public function __construct(array $admins)
+    private Closure $serializer;
+    /**
+     * AdminRole constructor.
+     * @param list<object|string> $admins
+     * @param callable(object): string $serializer
+     */
+    public function __construct(array $admins, callable $serializer)
     {
+        $this->serializer = Closure::fromCallable($serializer);
         foreach ($admins as $admin) {
-            $this->admins["{$admin->getAuthName()}|{$admin->getId()}"] = true;
+            $this->admins[is_object($admin) ? ($this->serializer)($admin) : $admin] = true;
         }
     }
 
-    /**
-     * @inheritdoc
-     * @codeCoverageIgnore
-     */
     public function getDescription(): string
     {
         return "you are an admin";
     }
 
-    /**
-     * @inheritdoc
-     */
     public function execute(
         object $source,
         object $target,
         string $permission,
         Environment $environment,
-        AccessChecker $manager
+        AccessChecker $accessChecker
     ): bool {
-        return isset($this->admins["{$source->getAuthName()}|{$source->getId()}"]);
+        $key = ($this->serializer)($source);
+        return isset($this->admins[$key]);
     }
 }

@@ -12,15 +12,6 @@ namespace SamIT\abac\interfaces;
  */
 interface RuleEngine
 {
-
-    /**
-     * @param Authorizable $source
-     * @param Authorizable $target
-     * @param string $permission
-     * @param Environment $environment
-     * @param AccessChecker $accessChecker
-     * @return bool
-     */
     public function check(
         object $source,
         object $target,

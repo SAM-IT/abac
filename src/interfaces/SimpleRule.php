@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SamIT\abac\interfaces;
@@ -11,7 +12,7 @@ namespace SamIT\abac\interfaces;
 interface SimpleRule
 {
     /**
-     * @return string A human readable description of what this rule does.
+     * @return non-empty-string A human readable description of what this rule does.
      * Finish the sentence: "You can [permission] the [object] if.."
      */
     public function getDescription(): string;

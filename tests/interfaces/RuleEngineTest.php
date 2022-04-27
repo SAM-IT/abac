@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace test;
@@ -14,21 +15,18 @@ use SamIT\abac\values\Authorizable;
 
 abstract class RuleEngineTest extends TestCase
 {
+    abstract protected function getEngine(SimpleRule ...$rules): RuleEngine;
 
     /**
-     * @param SimpleRule[] $rules
-     * @return RuleEngine
+     * @return iterable<array{0: Authorizable, 1: Authorizable, 2: string, 3: Environment, 4: AccessChecker, 5: bool}>
      */
-    abstract protected function getEngine(iterable $rules): RuleEngine;
-
-
     final public function checkProvider(): iterable
     {
         $source = new Authorizable('id1', 'name');
         $target = new Authorizable('id2', 'name');
-        $environment = new class extends \ArrayObject implements Environment {
+        $environment = new class() extends \ArrayObject implements Environment {
         };
-        $accessChecker = new class implements AccessChecker {
+        $accessChecker = new class() implements AccessChecker {
             public function check(object $source, object $target, string $permission): bool
             {
                 return false;
@@ -40,7 +38,10 @@ abstract class RuleEngineTest extends TestCase
         yield [$source, $target, 'jkl', $environment, $accessChecker, false];
     }
 
-    protected function getRules(): iterable
+    /**
+     * @return list<SimpleRule>
+     */
+    protected function getRules(): array
     {
         return [
             new ExecutionCountingRule(new PermissionMatchRule('/^abc$/')),
@@ -59,17 +60,16 @@ abstract class RuleEngineTest extends TestCase
         Environment $environment,
         AccessChecker $accessChecker,
         bool $result
-    ) {
-
+    ): void {
         $rules = $this->getRules();
-        $engine = $this->getEngine($rules);
-        $this->assertSame($result, $engine->check($source, $target, $permission, $environment, $accessChecker));
+        $engine = $this->getEngine(...$rules);
+        static::assertSame($result, $engine->check($source, $target, $permission, $environment, $accessChecker));
 
         // In case access is denied, all rules must have been checked.
         if (!$result) {
             /** @var ExecutionCountingRule $rule */
             foreach ($rules as $rule) {
-                $this->assertSame(1, $rule->getExecutions());
+                static::assertSame(1, $rule->getExecutions());
             }
         }
     }

@@ -1,48 +1,45 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SamIT\abac\resolvers;
 
+use SamIT\abac\exceptions\UnresolvableException;
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Resolver;
 
 /**
  * Class ChainedResolver
  * Chain multiple resolvers
- * @package SamIT\abac\resolvers
  */
 class ChainedResolver implements Resolver
 {
-    /** @var Resolver */
-    private $resolvers;
+    /** @var list<Resolver> */
+    private array $resolvers;
     public function __construct(Resolver ...$resolvers)
     {
-        $this->resolvers = $resolvers;
+        $this->resolvers = array_values($resolvers);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function fromSubject(object $object): ?Authorizable
+    public function fromSubject(object $object): Authorizable
     {
         foreach ($this->resolvers as $resolver) {
-            if (null !== $authorizable = $resolver->fromSubject($object)) {
-                return $authorizable;
+            try {
+                return $resolver->fromSubject($object);
+            } catch (UnresolvableException) {
             }
         }
-        return null;
+        throw UnresolvableException::forSubject($object);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function toSubject(Authorizable $authorizable): ?object
+    public function toSubject(Authorizable $authorizable): object
     {
         foreach ($this->resolvers as $resolver) {
-            if (null !== $subject = $resolver->toSubject($authorizable)) {
-                return $subject;
+            try {
+                return $resolver->toSubject($authorizable);
+            } catch (UnresolvableException) {
             }
         }
-        return null;
+        throw UnresolvableException::forSubject($authorizable);
     }
 }

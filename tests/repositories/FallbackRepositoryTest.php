@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace test\repositories;
@@ -13,7 +14,6 @@ use SamIT\abac\repositories\MemoryRepository;
  */
 class FallbackRepositoryTest extends PermissionRepositoryTest
 {
-
     protected function getRepository(): PermissionRepository
     {
         return new FallbackRepository(new MemoryRepository(), new EmptyRepository());

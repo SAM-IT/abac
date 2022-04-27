@@ -1,102 +1,103 @@
 <?php
+
 declare(strict_types=1);
 
 namespace test\repositories;
 
 use PHPUnit\Framework\TestCase;
 use SamIT\abac\interfaces\PermissionRepository;
+use SamIT\abac\values\Authorizable;
+use SamIT\abac\values\Grant;
 use function iter\toArray;
 
 abstract class PermissionRepositoryTest extends TestCase
 {
-
-
     abstract protected function getRepository(): PermissionRepository;
 
-    public function testGrant()
+    public function testGrant(): void
     {
         $repo = $this->getRepository();
 
-        $source = new \SamIT\abac\values\Authorizable('a', 'b');
-        $target = new \SamIT\abac\values\Authorizable('c', 'd');
+        $source = new Authorizable('a', 'b');
+        $target = new Authorizable('c', 'd');
         $permission = 'e';
 
-        $grant = new \SamIT\abac\values\Grant($source, $target, $permission);
+        $grant = new Grant($source, $target, $permission);
 
-        $this->assertFalse($repo->check($grant));
+        self::assertFalse($repo->check($grant));
 
         // Either grant succeeds and check must return TRUE
         $repo->grant($grant);
-        $this->assertTrue($repo->check($grant));
-        $this->assertTrue($repo->check(clone $grant));
+        self::assertTrue($repo->check($grant));
+        self::assertTrue($repo->check(clone $grant));
     }
 
 
 
-    public function testRevokeUngranted()
+    public function testRevokeUngranted(): void
     {
         $repo = $this->getRepository();
 
-        $source = new \SamIT\abac\values\Authorizable('a', 'b');
-        $target = new \SamIT\abac\values\Authorizable('c', 'd');
+        $source = new Authorizable('a', 'b');
+        $target = new Authorizable('c', 'd');
         $permission = 'e';
 
-        $grant = new \SamIT\abac\values\Grant($source, $target, $permission);
+        $grant = new Grant($source, $target, $permission);
 
         $repo->revoke($grant);
-        $this->assertFalse($repo->check($grant));
+        static::assertFalse($repo->check($grant));
     }
 
-    public function testEmptySearch()
+    public function testEmptySearch(): void
     {
         $repo = $this->getRepository();
-        $this->assertEmpty(toArray($repo->search(null, null, null)));
+        static::assertEmpty(toArray($repo->search(null, null, null)));
     }
 
     /**
      * @depends testRevoke
      */
-    public function testSearch()
+    public function testSearch(): void
     {
         $repo = $this->getRepository();
 
-        $source = new \SamIT\abac\values\Authorizable('a', 'b');
-        $target = new \SamIT\abac\values\Authorizable('c', 'd');
+        $source = new Authorizable('a', 'b');
+        $target = new Authorizable('c', 'd');
         $permission = 'e';
 
-        $grant1 = new \SamIT\abac\values\Grant($source, $target, $permission);
+        $grant1 = new Grant($source, $target, $permission);
 
         $repo->grant($grant1);
-        $this->assertCount(1, toArray($repo->search(null, null, null)));
-        $this->assertCount(1, toArray($repo->search($source, $target, $permission)));
+        static::assertCount(1, toArray($repo->search(null, null, null)));
+        static::assertCount(1, toArray($repo->search($source, $target, $permission)));
 
-        $this->assertCount(0, toArray($repo->search($source, $target, 'f')));
+        static::assertCount(0, toArray($repo->search($source, $target, 'f')));
 
-        $this->assertCount(0, toArray($repo->search($source, $source, $permission)));
-        $this->assertCount(0, toArray($repo->search($target, $target, $permission)));
+        static::assertCount(0, toArray($repo->search($source, $source, $permission)));
+        static::assertCount(0, toArray($repo->search($target, $target, $permission)));
     }
 
     /**
      * @depends testGrant
      */
-    public function testRevoke()
+    public function testRevoke(): void
     {
         $repo = $this->getRepository();
 
-        $source = new \SamIT\abac\values\Authorizable('a', 'b');
-        $target = new \SamIT\abac\values\Authorizable('c', 'd');
+        $source = new Authorizable('a', 'b');
+        $target = new Authorizable('c', 'd');
         $permission = 'e';
 
-        $grant = new \SamIT\abac\values\Grant($source, $target, $permission);
+        $grant = new Grant($source, $target, $permission);
 
         $repo->grant($grant);
-        $this->assertTrue($repo->check($grant));
+        static::assertTrue($repo->check($grant));
 
         try {
             $repo->revoke($grant);
-            $this->assertFalse($repo->check($grant));
+            static::assertFalse($repo->check($grant));
         } catch (\RuntimeException $e) {
-            $this->assertTrue($repo->check($grant));
+            static::assertTrue($repo->check($grant));
         }
     }
 }

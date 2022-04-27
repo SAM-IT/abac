@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace test\rules;
@@ -10,9 +11,11 @@ use SamIT\abac\rules\AnyoneCan;
 use SamIT\abac\values\Authorizable;
 use test\interfaces\SimpleRuleTest;
 
-class AnyoneCanTest extends SimpleRuleTest
+/**
+ * @covers \SamIT\abac\rules\AnyoneCan
+ */
+final class AnyoneCanTest extends SimpleRuleTest
 {
-
     protected function getRule(): SimpleRule
     {
         return new AnyoneCan('test');
@@ -24,9 +27,9 @@ class AnyoneCanTest extends SimpleRuleTest
         $admin = new Authorizable('1', 'admin');
         $target = new Authorizable('id2', 'name');
         $permission = 'test';
-        $environment = new class extends \ArrayObject implements Environment {
+        $environment = new class() extends \ArrayObject implements Environment {
         };
-        $accessChecker = new class implements AccessChecker {
+        $accessChecker = new class() implements AccessChecker {
             public function check(object $source, object $target, string $permission): bool
             {
                 return false;

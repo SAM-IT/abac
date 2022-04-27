@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace test\repositories;
@@ -11,22 +12,20 @@ use SamIT\abac\values\Grant;
 /**
  * @covers \SamIT\abac\repositories\EmptyRepository
  */
-class EmptyRepositoryTest extends PermissionRepositoryTest
+final class EmptyRepositoryTest extends PermissionRepositoryTest
 {
-
     protected function getRepository(): PermissionRepository
     {
         return new EmptyRepository();
     }
 
-    public function testGrant()
+    public function testGrant(): void
     {
-        $this->markTestSkipped('Empty repository does not support granting');
+        self::markTestSkipped("Granting not supported");
     }
 
-    public function testGrantThrowsException()
+    public function testRevoke(): void
     {
-        $this->expectException(\RuntimeException::class);
-        parent::testGrant();
+        self::markTestSkipped("Revoking not supported");
     }
 }

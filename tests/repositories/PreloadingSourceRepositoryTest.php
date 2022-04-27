@@ -1,40 +1,42 @@
 <?php
+
 declare(strict_types=1);
 
 namespace test\repositories;
 
 use SamIT\abac\repositories\MemoryRepository;
 use SamIT\abac\repositories\PreloadingSourceRepository;
+use SamIT\abac\values\Authorizable;
+use SamIT\abac\values\Grant;
 
 /**
  * @covers \SamIT\abac\repositories\PreloadingSourceRepository
  */
 class PreloadingSourceRepositoryTest extends PermissionRepositoryTest
 {
-
-    protected function getRepository(): \SamIT\abac\interfaces\PermissionRepository
+    protected function getRepository(): PreloadingSourceRepository
     {
-        return new \SamIT\abac\repositories\PreloadingSourceRepository(new \SamIT\abac\repositories\MemoryRepository());
+        return new PreloadingSourceRepository(new MemoryRepository());
     }
 
 
-    public function testPreloadedCache()
+    public function testPreloadedCache(): void
     {
         $base = new MemoryRepository();
         $subject = new PreloadingSourceRepository($base);
 
-        $source = new \SamIT\abac\values\Authorizable('a', 'b');
-        $target = new \SamIT\abac\values\Authorizable('c', 'd');
+        $source = new Authorizable('a', 'b');
+        $target = new Authorizable('c', 'd');
         $permission = 'e';
 
-        $grant = new \SamIT\abac\values\Grant($source, $target, $permission);
+        $grant = new Grant($source, $target, $permission);
 
         $subject->preloadSource($source);
         $base->grant($grant);
-        $this->assertFalse($subject->check($grant));
+        self::assertFalse($subject->check($grant));
 
         $subject->preloadSource($source);
         $base->revoke($grant);
-        $this->assertTrue($subject->check($grant));
+        self::assertTrue($subject->check($grant));
     }
 }

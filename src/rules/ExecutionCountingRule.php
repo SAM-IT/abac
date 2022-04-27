@@ -1,24 +1,20 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SamIT\abac\rules;
 
 use SamIT\abac\interfaces\AccessChecker;
 use SamIT\abac\interfaces\Environment;
+use SamIT\abac\interfaces\Rule;
 use SamIT\abac\interfaces\SimpleRule;
 
-class ExecutionCountingRule implements SimpleRule
+final class ExecutionCountingRule implements Rule
 {
-    /**
-     * @var SimpleRule
-     */
-    private $rule;
+    private int $counter = 0;
 
-    private $counter = 0;
-
-    public function __construct(SimpleRule $rule)
+    public function __construct(private readonly SimpleRule $rule)
     {
-        $this->rule = $rule;
     }
 
     public function getExecutions(): int
@@ -26,18 +22,11 @@ class ExecutionCountingRule implements SimpleRule
         return $this->counter;
     }
 
-    /**
-     * @inheritDoc
-     * @codeCoverageIgnore
-     */
     public function getDescription(): string
     {
-        return '';
+        return $this->rule->getDescription();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function execute(
         object $source,
         object $target,
@@ -47,5 +36,20 @@ class ExecutionCountingRule implements SimpleRule
     ): bool {
         $this->counter++;
         return $this->rule->execute($source, $target, $permission, $environment, $accessChecker);
+    }
+
+    public function getPermissions(): array
+    {
+        return $this->rule instanceof Rule ? $this->rule->getPermissions() : [];
+    }
+
+    public function getTargetNames(): array
+    {
+        return $this->rule instanceof Rule ? $this->rule->getTargetNames() : [];
+    }
+
+    public function getSourceNames(): array
+    {
+        return $this->rule instanceof Rule ? $this->rule->getSourceNames() : [];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SamIT\abac\helpers;
@@ -11,6 +12,9 @@ use SamIT\abac\interfaces\Grant;
  */
 class Cache
 {
+    /**
+     * @var array<string, bool>
+     */
     private array $entries = [];
 
     public function set(Grant $grant, bool $allowed): void

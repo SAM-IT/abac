@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace test\repositories;
@@ -8,7 +9,6 @@ namespace test\repositories;
  */
 class CachedReadRepositoryTest extends PermissionRepositoryTest
 {
-
     protected function getRepository(): \SamIT\abac\interfaces\PermissionRepository
     {
         return new \SamIT\abac\repositories\CachedReadRepository(new \SamIT\abac\repositories\MemoryRepository());

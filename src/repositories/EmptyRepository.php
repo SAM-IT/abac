@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SamIT\abac\repositories;
@@ -9,7 +10,6 @@ use SamIT\abac\interfaces\PermissionRepository;
 
 class EmptyRepository implements PermissionRepository
 {
-
     /**
      * @inheritDoc
      */

@@ -1,23 +1,26 @@
 <?php
+
 declare(strict_types=1);
 
 namespace test;
 
+use SamIT\abac\values\Authorizable;
+use SamIT\abac\values\Grant as Grant;
+
+/**
+ * @covers \SamIT\abac\values\Grant
+ */
 class GrantTest extends \PHPUnit\Framework\TestCase
 {
-
-    /**
-     * @covers \SamIT\abac\values\Grant
-     */
-    public function testGetters()
+    public function testGetters(): void
     {
-        $source = new \SamIT\abac\values\Authorizable('a', 'b');
-        $target = new \SamIT\abac\values\Authorizable('c', 'd');
+        $source = new Authorizable('a', 'b');
+        $target = new Authorizable('c', 'd');
         $permission = 'e';
 
-        $grant = new \SamIT\abac\values\Grant($source, $target, $permission);
-        $this->assertSame($source, $grant->getSource());
-        $this->assertSame($target, $grant->getTarget());
-        $this->assertSame($permission, $grant->getPermission());
+        $grant = new Grant($source, $target, $permission);
+        self::assertSame($source, $grant->getSource());
+        self::assertSame($target, $grant->getTarget());
+        self::assertSame($permission, $grant->getPermission());
     }
 }

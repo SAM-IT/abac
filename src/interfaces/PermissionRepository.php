@@ -1,21 +1,24 @@
 <?php
 
+declare(strict_types=1);
 
 namespace SamIT\abac\interfaces;
+
+use RuntimeException;
 
 interface PermissionRepository
 {
     /**
      * Store a permission in persistent storage
      * @param Grant $grant
-     * @throws \RuntimeException if the Source does not have access to Target after execution
+     * @throws RuntimeException if the Source does not have access to Target after execution
      */
     public function grant(Grant $grant): void;
 
     /**
      * Remove a permission from persistent storage
      * @param Grant $grant
-     * @throws \RuntimeException if the Source still has access to Target after execution
+     * @throws RuntimeException if the Source still has access to Target after execution
      */
     public function revoke(Grant $grant): void;
 
@@ -31,7 +34,7 @@ interface PermissionRepository
      * @param ?Authorizable $source
      * @param ?Authorizable $target
      * @param ?string $permission
-     * @return Grant[]
+     * @return iterable<Grant>
      */
     public function search(?Authorizable $source, ?Authorizable $target, ?string $permission): iterable;
 }

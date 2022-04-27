@@ -1,58 +1,38 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SamIT\abac;
 
 use SamIT\abac\exceptions\NestingException;
+use SamIT\abac\exceptions\UnresolvableException;
 use SamIT\abac\exceptions\UnresolvableSourceException;
 use SamIT\abac\exceptions\UnresolvableTargetException;
 use SamIT\abac\interfaces\AccessChecker;
+use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Environment;
 use SamIT\abac\interfaces\PermissionRepository;
 use SamIT\abac\interfaces\Resolver;
 use SamIT\abac\interfaces\RuleEngine;
-use SamIT\abac\values\Authorizable;
 use SamIT\abac\values\Grant;
 
 class AuthManager implements AccessChecker
 {
     public const MAX_DEPTH = 400;
-    /**
-     * @var PermissionRepository
-     */
-    private $permissionRepository;
 
-    /**
-     * @var RuleEngine
-     */
-    private $ruleEngine;
-
-    /**
-     * @var Resolver
-     */
-    private $resolver;
-
-    /**
-     * @var Environment
-     */
-    private $environment;
-
-    private $depth = 0;
-    private $partialResults = [];
+    private int $depth = 0;
+    /** @var array<string, bool>  */
+    private array $partialResults = [];
 
     public function __construct(
-        RuleEngine $ruleEngine,
-        PermissionRepository $permissionRepository,
-        Resolver $resolver,
-        Environment $environment
+        private readonly RuleEngine $ruleEngine,
+        private readonly PermissionRepository $permissionRepository,
+        private readonly Resolver $resolver,
+        private readonly Environment $environment
     ) {
-        $this->ruleEngine = $ruleEngine;
-        $this->permissionRepository = $permissionRepository;
-        $this->resolver = $resolver;
-        $this->environment = $environment;
     }
 
-    private function storePartial(Grant $grant, bool $result)
+    private function storePartial(Grant $grant, bool $result): void
     {
         if ($this->depth > 1) {
             $source = $grant->getSource();
@@ -62,6 +42,11 @@ class AuthManager implements AccessChecker
         }
     }
 
+    /**
+     * Checks the partial result cache
+     * @param Grant $grant
+     * @return bool|null
+     */
     private function getPartial(Grant $grant): ?bool
     {
         if ($this->depth > 1) {
@@ -88,9 +73,9 @@ class AuthManager implements AccessChecker
             }
 
 
-            $sourceAuthorizable = $this->resolver->fromSubject($source);
-            $targetAuthorizable = $this->resolver->fromSubject($target);
-            if (isset($sourceAuthorizable, $targetAuthorizable)) {
+            try {
+                $sourceAuthorizable = $this->resolver->fromSubject($source);
+                $targetAuthorizable = $this->resolver->fromSubject($target);
                 $grant = new Grant($sourceAuthorizable, $targetAuthorizable, $permission);
                 if (null === $result = $this->getPartial($grant)) {
                     $result = $this->permissionRepository->check($grant) || $this->ruleEngine->check(
@@ -102,9 +87,10 @@ class AuthManager implements AccessChecker
                     );
                     $this->storePartial($grant, $result);
                 }
-            } else {
+                return $result;
+            } catch (UnresolvableException $e) {
                 // If either source or target is not resolvable, we can still use the rule engine.
-                $result = $this->ruleEngine->check(
+                return $this->ruleEngine->check(
                     $source,
                     $target,
                     $permission,
@@ -112,8 +98,6 @@ class AuthManager implements AccessChecker
                     $this
                 );
             }
-
-            return $result;
         } finally {
             $this->depth--;
             if ($this->depth === 0) {
@@ -122,16 +106,18 @@ class AuthManager implements AccessChecker
         }
     }
 
-    public function grant(object $source, object $target, string $permission)
+    public function grant(object $source, object $target, string $permission): void
     {
-        $sourceAuthorizable = $this->resolver->fromSubject($source);
-        if (!isset($sourceAuthorizable)) {
-            throw new UnresolvableSourceException($source);
+        try {
+            $sourceAuthorizable = $this->resolver->fromSubject($source);
+        } catch (UnresolvableException) {
+            throw UnresolvableSourceException::forSubject($source);
         }
 
-        $targetAuthorizable = $this->resolver->fromSubject($target);
-        if (!isset($targetAuthorizable)) {
-            throw new UnresolvableTargetException($target);
+        try {
+            $targetAuthorizable = $this->resolver->fromSubject($target);
+        } catch (UnresolvableException) {
+            throw UnresolvableTargetException::forSubject($target);
         }
 
         $grant = new Grant($sourceAuthorizable, $targetAuthorizable, $permission);
@@ -139,16 +125,18 @@ class AuthManager implements AccessChecker
         $this->permissionRepository->grant($grant);
     }
 
-    public function revoke(object $source, object $target, string $permission)
+    public function revoke(object $source, object $target, string $permission): void
     {
-        $sourceAuthorizable = $this->resolver->fromSubject($source);
-        if (!isset($sourceAuthorizable)) {
-            throw new UnresolvableSourceException($source);
+        try {
+            $sourceAuthorizable = $this->resolver->fromSubject($source);
+        } catch (UnresolvableException) {
+            throw UnresolvableSourceException::forSubject($source);
         }
 
-        $targetAuthorizable = $this->resolver->fromSubject($target);
-        if (!isset($targetAuthorizable)) {
-            throw new UnresolvableTargetException($target);
+        try {
+            $targetAuthorizable = $this->resolver->fromSubject($target);
+        } catch (UnresolvableException) {
+            throw UnresolvableTargetException::forSubject($target);
         }
 
         $grant = new Grant($sourceAuthorizable, $targetAuthorizable, $permission);
@@ -161,7 +149,7 @@ class AuthManager implements AccessChecker
         return $this->permissionRepository;
     }
 
-    final public function resolveSubject(object $subject): ?Authorizable
+    final public function resolveSubject(object $subject): Authorizable
     {
         return $this->resolver->fromSubject($subject);
     }

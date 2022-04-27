@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace SamIT\abac\engines;
 
@@ -10,35 +11,25 @@ use SamIT\abac\interfaces\SimpleRule;
 
 class SimpleEngine implements RuleEngine
 {
-    /** @var SimpleRule[] */
-    private $rules = [];
-
     /**
-     * SimpleEngine constructor.
-     * @param SimpleRule[]|iterable $rules The rules this engine should use
+     * @var list<SimpleRule>
      */
-    public function __construct(iterable $rules)
+    private readonly array $rules;
+
+    public function __construct(SimpleRule ...$rules)
     {
-        foreach ($rules as $rule) {
-            if (!$rule instanceof SimpleRule) {
-                throw new \InvalidArgumentException('Rules must implement SimpleRule');
-            }
-            $this->rules[] = $rule;
-        }
+        $this->rules = array_values($rules);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function check(
         object $source,
         object $target,
         string $permission,
         Environment $environment,
-        AccessChecker $recursiveLookup
+        AccessChecker $accessChecker
     ): bool {
         foreach ($this->rules as $rule) {
-            if ($rule->execute($source, $target, $permission, $environment, $recursiveLookup)) {
+            if ($rule->execute($source, $target, $permission, $environment, $accessChecker)) {
                 return true;
             }
         }

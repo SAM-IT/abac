@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
 
 namespace SamIT\abac\interfaces;
 
-interface Environment extends \ArrayAccess
-{
+use ArrayAccess;
 
+/**
+ * @extends ArrayAccess<mixed, mixed>
+ */
+interface Environment extends ArrayAccess
+{
 }

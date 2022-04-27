@@ -1,31 +1,28 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SamIT\abac\resolvers;
 
+use SamIT\abac\exceptions\UnresolvableException;
 use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Resolver;
 
 /**
  * Class AuthorizableResolver
- * Resolves authorizables, essentially this is an identity resolver.
- * @package SamIT\abac\resolvers
+ * Resolves Authorizables, essentially this is an identity resolver.
  */
 class AuthorizableResolver implements Resolver
 {
-
-    /**
-     * @inheritDoc
-     */
-    public function fromSubject(object $object): ?Authorizable
+    public function fromSubject(object $object): Authorizable
     {
-        return $object instanceof Authorizable ? $object : null;
+        if ($object instanceof Authorizable) {
+            return $object;
+        }
+        throw UnresolvableException::forSubject($object);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function toSubject(Authorizable $authorizable): ?object
+    public function toSubject(Authorizable $authorizable): object
     {
         return $authorizable;
     }

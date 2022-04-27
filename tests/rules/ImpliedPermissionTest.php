@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace test\rules;
@@ -17,10 +18,13 @@ use test\interfaces\SimpleRuleTest;
  */
 class ImpliedPermissionTest extends SimpleRuleTest
 {
-
-    protected function getRule(): SimpleRule
+    /**
+     * @param list<string> $sourceNames
+     * @param list<string> $targetNames
+     */
+    protected function getRule(array $sourceNames = [], array $targetNames = []): ImpliedPermission
     {
-        return new ImpliedPermission('a', ['b']);
+        return new ImpliedPermission('a', ['b'], $sourceNames, $targetNames);
     }
 
     public function checkProvider(): iterable
@@ -28,9 +32,9 @@ class ImpliedPermissionTest extends SimpleRuleTest
         $source = new Authorizable('id1', 'name');
         $admin = new Authorizable('1', 'admin');
         $target = new Authorizable('id2', 'name');
-        $environment = new class extends \ArrayObject implements Environment {
+        $environment = new class() extends \ArrayObject implements Environment {
         };
-        $accessChecker = new class implements AccessChecker {
+        $accessChecker = new class() implements AccessChecker {
             public function check(object $source, object $target, string $permission): bool
             {
                 if ($permission === 'a'
@@ -50,5 +54,28 @@ class ImpliedPermissionTest extends SimpleRuleTest
         yield [$admin, $target, 'b', $environment, $accessChecker, true];
         yield [$source, $admin, 'a', $environment, $accessChecker, false];
         yield [$source, $admin, 'a', $environment, $accessChecker, false];
+    }
+
+    public function testGetPermissions(): void
+    {
+        self::assertSame(['b'], $this->getRule()->getPermissions());
+    }
+
+    public function testGetSourceNames(): void
+    {
+        $sourceNames = [];
+        for ($i = 0; $i < 10; $i++) {
+            $sourceNames[] = random_bytes(15);
+        }
+        self::assertSame($sourceNames, $this->getRule($sourceNames)->getSourceNames());
+    }
+
+    public function testGetTargetNames(): void
+    {
+        $targetNames = [];
+        for ($i = 0; $i < 10; $i++) {
+            $targetNames[] = random_bytes(15);
+        }
+        self::assertSame($targetNames, $this->getRule([], $targetNames)->getTargetNames());
     }
 }

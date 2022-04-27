@@ -1,7 +1,7 @@
 name: Continous integration
 on: [push, pull_request]
 jobs:
-  cs:
+  code_checks:
     name: Check code style
     runs-on: ubuntu-latest
     steps:
@@ -9,54 +9,54 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
-          tools: phpcs
-          extensions: xmlwriter
+          php-version: '8.1'
+          tools: symplify/easy-coding-standard, phpstan, phpunit, phpDocumentor
       - name: Test code style
-        run: phpcs
-  test:
-    name: Run tests
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php: ['7.4']
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl
-          coverage: pcov
-          extensions: mbstring, curl, json, pdo-sqlite
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache dependencies
-        uses: actions/cache@v1
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ matrix.php }}-composer-
+        run: ecs
       - name: Install dependencies
-        run: composer install --prefer-dist
-      - name: Run tests
-        run: composer test -- --coverage-clover coverage.xml
-      - name: Get Ocular
-        run: wget https://scrutinizer-ci.com/ocular.phar
-      - name: Push code coverage
-        run: php ocular.phar code-coverage:upload --format=php-clover coverage.xml
+        run: composer install --no-dev
+      - name: Static analysis
+        run: phpstan analyse src
+      - name: Install dependencies including dev
+        run: composer install
+      - name: Tests
+        run: phpunit --coverage-clover coverage.xml
+      - name: Static analysis of tests
+        run: phpstan analyse tests
+      - name: Generate docs
+        run: phpdoc run
+      - name: Deploy docs to pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+      - uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+  commitlint:
+    name: commit-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ahmadnassri/action-commit-lint@v1
+        with:
+          config: conventional
   release:
     name: Automated release
-    needs: [test, cs]
+    needs: [code_checks]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: '14.x'
-      - name: install dependencies for semantic-release
-        run: npm ci
-      - run: $(npm bin)/semantic-release
+          node-version: '16.x'
+      - run: >
+          npx
+          -p "@semantic-release/commit-analyzer"
+          -p "@semantic-release/release-notes-generator"
+          -p conventional-changelog-conventionalcommits
+          -p semantic-release
+          -- semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

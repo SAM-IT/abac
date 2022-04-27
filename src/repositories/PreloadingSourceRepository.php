@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SamIT\abac\repositories;
@@ -19,6 +20,9 @@ class PreloadingSourceRepository implements PermissionRepository
 
     private Cache $cache;
 
+    /**
+     * @var array<string, true>
+     */
     private array $loadedSources = [];
 
     private function serializeAuthorizable(Authorizable $authorizable): string
@@ -50,7 +54,7 @@ class PreloadingSourceRepository implements PermissionRepository
         if (!isset($this->loadedSources[$this->serializeAuthorizable($grant->getSource())])) {
             return null;
         }
-        return $this->cache->check($grant) || false;
+        return $this->cache->check($grant) ?? false;
     }
 
     public function check(Grant $grant): bool

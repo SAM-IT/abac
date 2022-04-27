@@ -1,23 +1,20 @@
 <?php
+
 declare(strict_types=1);
 
 namespace test;
 
 use SamIT\abac\engines\SimpleEngine;
 use SamIT\abac\interfaces\RuleEngine;
+use SamIT\abac\interfaces\SimpleRule;
 
+/**
+ * @covers \SamIT\abac\engines\SimpleEngine
+ */
 class SimpleEngineTest extends RuleEngineTest
 {
-
-    public function testConstructor()
+    protected function getEngine(SimpleRule ...$rules): RuleEngine
     {
-        $this->expectException(\InvalidArgumentException::class);
-        new SimpleEngine([
-            new \stdClass()
-        ]);
-    }
-    protected function getEngine(iterable $rules): RuleEngine
-    {
-        return new SimpleEngine($rules);
+        return new SimpleEngine(...$rules);
     }
 }

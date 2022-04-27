@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SamIT\abac\values;
@@ -8,13 +9,8 @@ namespace SamIT\abac\values;
  */
 final class Authorizable implements \SamIT\abac\interfaces\Authorizable
 {
-    private $id;
-    private $name;
-
-    public function __construct(string $id, string $name)
+    public function __construct(private readonly string $id, private readonly string $name)
     {
-        $this->id = $id;
-        $this->name = $name;
     }
 
     public function getId(): string

@@ -1,10 +1,10 @@
 <?php
 
+declare(strict_types=1);
 
 namespace SamIT\abac\rules;
 
 use SamIT\abac\interfaces\AccessChecker;
-use SamIT\abac\interfaces\Authorizable;
 use SamIT\abac\interfaces\Environment;
 use SamIT\abac\interfaces\Rule;
 
@@ -14,38 +14,37 @@ use SamIT\abac\interfaces\Rule;
 class ImpliedPermission implements Rule
 {
     /**
-     * @var string
+     * @var array<string, true> Keys contain the permissions, values a constant
      */
-    private $required;
+    private readonly array $implied;
 
     /**
-     * @var array|true[string] Keys contain the permissions, values a constant
+     * @param string $requiredPermission
+     * @param list<string> $impliedPermissions
+     * @param list<string> $sourceNames,
+     * @param list<string> $targetNames
      */
-    private $implied = [];
-
-    public function __construct(string $requiredPermission, array $impliedPermission)
-    {
-        $this->required = $requiredPermission;
-        foreach ($impliedPermission as $permission) {
-            $this->implied[$permission] = true;
+    public function __construct(
+        private readonly string $requiredPermission,
+        array $impliedPermissions,
+        private readonly array $sourceNames = [],
+        private readonly array $targetNames = []
+    ) {
+        $implied = [];
+        foreach ($impliedPermissions as $permission) {
+            $implied[$permission] = true;
         }
+        $this->implied = $implied;
     }
 
     /**
-     * @inheritdoc
      * "you can ... if [description]"
-     * @codeCoverageIgnore
      */
     public function getDescription(): string
     {
-        return "you can [{$this->required}] it.";
+        return "you can [{$this->requiredPermission}] it.";
     }
 
-    /**
-     * @param Authorizable $source
-     * @param \SamIT\abac\interfaces\Authorizable $target
-     * @return boolean
-     */
     public function execute(
         object $source,
         object  $target,
@@ -54,21 +53,19 @@ class ImpliedPermission implements Rule
         AccessChecker $accessChecker
     ): bool {
         return isset($this->implied[$permission])
-            && $accessChecker->check($source, $target, $this->required);
+            && $accessChecker->check($source, $target, $this->requiredPermission);
     }
 
     /**
-     * @inheritDoc
-     * @codeCoverageIgnore
+     * @return list<string>
      */
     public function getTargetNames(): array
     {
-        return [];
+        return $this->targetNames;
     }
 
     /**
-     * @inheritDoc
-     * @codeCoverageIgnore
+     * @return list<string>
      */
     public function getPermissions(): array
     {
@@ -76,11 +73,10 @@ class ImpliedPermission implements Rule
     }
 
     /**
-     * @inheritDoc
-     * @codeCoverageIgnore
+     * @return list<string>
      */
     public function getSourceNames(): array
     {
-        return [];
+        return $this->sourceNames;
     }
 }

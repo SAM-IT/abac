@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace test\interfaces;
@@ -11,9 +12,11 @@ use SamIT\abac\interfaces\SimpleRule;
 
 abstract class SimpleRuleTest extends TestCase
 {
-
     abstract protected function getRule(): SimpleRule;
 
+    /**
+     * @return iterable<array{0: Authorizable, 1: Authorizable, 2: string, 3: Environment, 4: AccessChecker, 5: bool}>
+     */
     abstract public function checkProvider(): iterable;
 
     /**
@@ -26,8 +29,13 @@ abstract class SimpleRuleTest extends TestCase
         Environment $environment,
         AccessChecker $accessChecker,
         bool $result
-    ) {
+    ): void {
         $rule = $this->getRule();
-        $this->assertSame($result, $rule->execute($source, $target, $permission, $environment, $accessChecker));
+        static::assertSame($result, $rule->execute($source, $target, $permission, $environment, $accessChecker));
+    }
+
+    public function testHasDescription(): void
+    {
+        static::assertNotEmpty($this->getRule()->getDescription());
     }
 }
