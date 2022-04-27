@@ -44,25 +44,6 @@
             "url": "https://asset-packagist.org"
         }
     ],
-    "scripts": {
-        "post-install-cmd": "cghooks add --ignore-lock",
-        "test": "phpunit --coverage-html coverage",
-        "lint": "phpcs",
-        "lint-fix": "phpcbf"
-    },
-    "extra": {
-        "hooks": {
-            "pre-commit": [
-                "echo committing as $(git config user.name) &&",
-                "composer lint-fix  &&",
-                "composer lint &&",
-                "composer test"
-            ],
-            "commit-msg": [
-                "npx commitlint -e"
-            ]
-        }
-    },
     "config": {
         "allow-plugins": {
             "phpstan/extension-installer": true,
