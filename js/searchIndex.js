@@ -343,7 +343,7 @@ Search.appendIndex(
         },                {
             "fqsen": "\\SamIT\\abac\\interfaces\\RuleEngine",
             "name": "RuleEngine",
-            "summary": "Interface\u0020RuleEngine",
+            "summary": "Interface\u0020RuleEngine\nImplementations\u0020should\u0020\u0028probably\u0029\u003A\n\u002D\u0020Implement\u0020some\u0020way\u0020to\u0020load\u0020\/\u0020define\u0020rules\n\u002D\u0020Implement\u0020an\u0020efficient\u0020method\u0020of\u0020deciding\u0020which\u0020rules\u0020to\u0020execute",
             "url": "classes/SamIT-abac-interfaces-RuleEngine.html"
         },                {
             "fqsen": "\\SamIT\\abac\\interfaces\\RuleEngine\u003A\u003Acheck\u0028\u0029",

@@ -72,16 +72,6 @@
     <a href="packages/AttributeBasedAccessControl.html" class="-active">AttributeBasedAccessControl</a>
 </h4>
 
-                                    <h4 class="phpdocumentor-sidebar__root-namespace">
-    <a href="packages/SamIT.html" class="">SamIT</a>
-</h4>
-    <ul class="phpdocumentor-list">
-                    <li>
-                <a href="packages/SamIT-abac.html" class="">abac</a>
-                
-            </li>
-            </ul>
-
                         </section>
             
     <section class="phpdocumentor-sidebar__category">
@@ -132,6 +122,11 @@
         <dd>Interface Rule
 Rules implementing this interface can be optimized by a RuleEngine; for example if the requested permission is not in
 the list returned by `getPermissions()` then the RuleEngine MAY skip this rule.</dd>
+            <dt class="phpdocumentor-table-of-contents__entry -interface"><a href="classes/SamIT-abac-interfaces-RuleEngine.html"><abbr title="\SamIT\abac\interfaces\RuleEngine">RuleEngine</abbr></a></dt>
+        <dd>Interface RuleEngine
+Implementations should (probably):
+- Implement some way to load / define rules
+- Implement an efficient method of deciding which rules to execute</dd>
             <dt class="phpdocumentor-table-of-contents__entry -interface"><a href="classes/SamIT-abac-interfaces-SimpleRule.html"><abbr title="\SamIT\abac\interfaces\SimpleRule">SimpleRule</abbr></a></dt>
         <dd>Interface SimpleRule
 This interface is the minimum that must be implemented by a Rule Class.</dd>
@@ -140,6 +135,8 @@ This interface is the minimum that must be implemented by a Rule Class.</dd>
         <dd></dd>
             <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/SamIT-abac-engines-SimpleEngine.html"><abbr title="\SamIT\abac\engines\SimpleEngine">SimpleEngine</abbr></a></dt>
         <dd></dd>
+            <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/SamIT-abac-exceptions-NestingException.html"><abbr title="\SamIT\abac\exceptions\NestingException">NestingException</abbr></a></dt>
+        <dd>Class NestingException</dd>
             <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/SamIT-abac-exceptions-UnresolvableException.html"><abbr title="\SamIT\abac\exceptions\UnresolvableException">UnresolvableException</abbr></a></dt>
         <dd></dd>
             <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/SamIT-abac-exceptions-UnresolvableSourceException.html"><abbr title="\SamIT\abac\exceptions\UnresolvableSourceException">UnresolvableSourceException</abbr></a></dt>
@@ -148,10 +145,20 @@ This interface is the minimum that must be implemented by a Rule Class.</dd>
         <dd></dd>
             <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/SamIT-abac-helpers-AuthorizableSerializer.html"><abbr title="\SamIT\abac\helpers\AuthorizableSerializer">AuthorizableSerializer</abbr></a></dt>
         <dd></dd>
+            <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/SamIT-abac-helpers-Cache.html"><abbr title="\SamIT\abac\helpers\Cache">Cache</abbr></a></dt>
+        <dd>Helper class for repositories that want to do some kind of caching on grant checks</dd>
+            <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/SamIT-abac-repositories-CachedReadRepository.html"><abbr title="\SamIT\abac\repositories\CachedReadRepository">CachedReadRepository</abbr></a></dt>
+        <dd>Class CachedReadRepository
+Caches results from a repository in memory for the duration of a request</dd>
             <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/SamIT-abac-repositories-EmptyRepository.html"><abbr title="\SamIT\abac\repositories\EmptyRepository">EmptyRepository</abbr></a></dt>
         <dd></dd>
+            <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/SamIT-abac-repositories-FallbackRepository.html"><abbr title="\SamIT\abac\repositories\FallbackRepository">FallbackRepository</abbr></a></dt>
+        <dd>Class FallbackRepository
+This class allows for multiple explicit permission sources.</dd>
             <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/SamIT-abac-repositories-MemoryRepository.html"><abbr title="\SamIT\abac\repositories\MemoryRepository">MemoryRepository</abbr></a></dt>
         <dd></dd>
+            <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/SamIT-abac-repositories-PreloadingSourceRepository.html"><abbr title="\SamIT\abac\repositories\PreloadingSourceRepository">PreloadingSourceRepository</abbr></a></dt>
+        <dd>Repository that allows preloading permissions for a source.</dd>
             <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/SamIT-abac-resolvers-AuthorizableResolver.html"><abbr title="\SamIT\abac\resolvers\AuthorizableResolver">AuthorizableResolver</abbr></a></dt>
         <dd>Class AuthorizableResolver
 Resolves Authorizables, essentially this is an identity resolver.</dd>
@@ -170,6 +177,8 @@ Chain multiple resolvers</dd>
         <dd></dd>
             <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/SamIT-abac-values-Authorizable.html"><abbr title="\SamIT\abac\values\Authorizable">Authorizable</abbr></a></dt>
         <dd>Simple immutable Authorizable implementation</dd>
+            <dt class="phpdocumentor-table-of-contents__entry -class"><a href="classes/SamIT-abac-values-Grant.html"><abbr title="\SamIT\abac\values\Grant">Grant</abbr></a></dt>
+        <dd>Simple value object</dd>
     
     
     </dl>
