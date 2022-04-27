@@ -8,7 +8,6 @@ use SamIT\abac\interfaces\Grant;
 
 /**
  * Helper class for repositories that want to do some kind of caching on grant checks
- * @package SamIT\abac\helpers
  */
 class Cache
 {

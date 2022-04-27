@@ -8,30 +8,14 @@ use SamIT\abac\interfaces\Authorizable;
 
 /**
  * Simple value object
- * @package SamIT\abac
  */
 final class Grant implements \SamIT\abac\interfaces\Grant
 {
-    /**
-     * @var Authorizable
-     */
-    private $source;
-
-    /**
-     * @var Authorizable
-     */
-    private $target;
-
-    /**
-     * @var string
-     */
-    private $permission;
-
-    public function __construct(Authorizable $source, Authorizable $target, string $permission)
-    {
-        $this->source = $source;
-        $this->target = $target;
-        $this->permission = $permission;
+    public function __construct(
+        private readonly Authorizable $source,
+        private readonly Authorizable $target,
+        private readonly string $permission
+    ) {
     }
 
     public function getSource(): Authorizable

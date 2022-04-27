@@ -12,7 +12,6 @@ use SamIT\abac\interfaces\PermissionRepository;
 /**
  * Repository that allows preloading permissions for a source.
  * Advantage of preloading is that we can serve cache misses too since we know we've loaded all explicit permissions.
- * @package SamIT\abac\repositories
  */
 class PreloadingSourceRepository implements PermissionRepository
 {

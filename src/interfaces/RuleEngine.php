@@ -5,7 +5,6 @@ namespace SamIT\abac\interfaces;
 
 /**
  * Interface RuleEngine
- * @package SamIT\abac\interfaces
  * Implementations should (probably):
  * - Implement some way to load / define rules
  * - Implement an efficient method of deciding which rules to execute

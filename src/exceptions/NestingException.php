@@ -7,7 +7,6 @@ namespace SamIT\abac\exceptions;
 /**
  * Class NestingException
  * @codeCoverageIgnore
- * @package SamIT\abac\exceptions
  */
 class NestingException extends \RuntimeException
 {

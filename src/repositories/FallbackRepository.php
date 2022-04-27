@@ -16,8 +16,6 @@ use SamIT\abac\interfaces\PermissionRepository;
  * - Lookups fall back in case no result was found in the first.
  * - Revokes are done in both
  * - Search returns results from both
- * @package SamIT\abac\repositories
- *
  */
 class FallbackRepository implements PermissionRepository
 {

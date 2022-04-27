@@ -13,7 +13,6 @@ use SamIT\abac\interfaces\PermissionRepository;
 /**
  * Class CachedReadRepository
  * Caches results from a repository in memory for the duration of a request
- * @package SamIT\abac
  */
 class CachedReadRepository implements PermissionRepository
 {
